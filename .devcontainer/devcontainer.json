@@ -1,0 +1,4 @@
+{
+	"name": "F# (.NET Core 5.0)",
+	"dockerFile": "Dockerfile"
+}
