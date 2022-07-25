@@ -1,6 +1,11 @@
 {
+    "html.suggest.html5": true,
     "emmet.includeLanguages": {
-        "njk": "html",
-        "nunjucks": "html"
-    }
+        "md": "html",
+        "njk": "html"
+    },
+    "files.associations": {
+        "*.pcss": "css",
+    },
+    "css.validate": false
 }

@@ -1,9 +1,9 @@
----
-title: This is my first post
-layout: layouts/post.njk
----
+(***
+title: This is post written using F# literate
+layout: layouts/base.njk
+***)
 
-Hello from my blog
+Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog Hello from my blog
 
 ```fs
 let value = "Hello World"
@@ -29,3 +29,18 @@ function add(x, y) {
 +  return x + y;
 }
 ```
+
+----
+
+# Almost before we know, we had left the ground.
+
+## Almost before we know, we had left the ground.
+
+### Almost before we know, we had left the ground.
+
+#### Almost before we know, we had left the ground.
+
+
+{% set lastModifiedDate = page.inputPath | lastModifiedDate | formatDate %}
+
+<i>Last updated on <strong>{{ lastModifiedDate }}</strong></i>

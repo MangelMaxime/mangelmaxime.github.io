@@ -1,0 +1,79 @@
+/*
+    Type scale design based on
+    https://moderncss.dev/generating-font-size-css-rules-and-creating-a-fluid-type-scale/
+*/
+
+:root {
+    /* Ratios taking from https://type-scale.com/ */
+    --type-scale-minor-second: 1.067;
+    --type-scale-major-second: 1.125;
+    --type-scale-minor-third: 1.2;
+    --type-scale-major-third: 1.25;
+    --type-scale-perfect-fourth: 1.333;
+    --type-scale-augmented-fourth: 1.414;
+    --type-scale-perfect-fifth: 1.5;
+    --type-scale-golden-ratio: 1.618;
+
+    /* Type scale user configuration */
+    --type-base-size: 1.15rem;
+    --type-size-ratio: var(--type-scale-perfect-fourth);
+
+    /* Compute the different text size */
+    --size-4: calc(var(--type-base-size) * var(--type-size-ratio));
+    --size-3: calc(var(--size-4) * var(--type-size-ratio));
+    --size-2: calc(var(--size-3) * var(--type-size-ratio));
+    --size-1: calc(var(--size-2) * var(--type-size-ratio));
+}
+
+body {
+    font-family: system-ui;
+}
+
+p,
+li,
+h1,
+h2,
+h3,
+h4 {
+    /* Help prevent overflow of long words/names/URLs */
+    overflow-wrap: break-word;
+
+    /* Optional, not supported for all languages */
+    hyphens: auto;
+    margin-top: 0;
+}
+
+p {
+    font-size: var(--type-base-size);
+}
+
+h1 {
+    font-size: var(--size-1);
+    line-height: calc(2px + 2ex + 2px);
+    margin-bottom: 0.65em;
+}
+
+h2 {
+    font-size: var(--size-2);
+    line-height: calc(2px + 2ex + 2px);
+    margin-bottom: 0.65em;
+}
+
+h3 {
+    font-size: var(--size-3);
+    line-height: calc(2px + 2ex + 2px);
+    margin-bottom: 0.65em;
+}
+
+h4 {
+    font-size: var(--size-4);
+    line-height: calc(2px + 2ex + 2px);
+    margin-bottom: 0.65em;
+}
+
+.grvsc-container {
+    & code {
+        font-size: 1rem;
+        font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+    }
+}

@@ -1,15 +1,9 @@
----
-title: Home page
-date: 2020-05-10
----
-<html lang="en">
-  <head>
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="assets/style.css">
-  </head>
-  <body>
-    {% set greeting = 'hello' %}
+{% extends "layouts/base.njk" %}
 
-    Yay, {{ greeting | upper }} world!
-  </body>
-</html>
+{% block pageContent %}
+
+{% set lastModifiedDate = page.inputPath | lastModifiedDate | formatDate %}
+
+<i>Last updated on <strong>{{ lastModifiedDate }}</strong></i>
+
+{% endblock pageContent %}
