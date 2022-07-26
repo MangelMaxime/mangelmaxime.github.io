@@ -1,0 +1,16 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.fsproj]
+indent_size = 2
+
+[*.{fs,fsx}]
+fsharp_max_record_width=0
+fsharp_multiline_block_brackets_on_same_column=true
+fsharp_bar_before_discriminated_union_declaration=true
