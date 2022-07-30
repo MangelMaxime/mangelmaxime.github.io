@@ -1,0 +1,15 @@
+*,
+::before,
+::after {
+    box-sizing: border-box;
+}
+
+html {
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    line-height: 1.5;
+    font-size: var(--text-base-size);
+    font-family: var(--font-sans);
+}

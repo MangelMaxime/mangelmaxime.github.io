@@ -1,3 +1,14 @@
 {
-    "FSharp.suggestGitignore": false
+    "FSharp.suggestGitignore": false,
+    "cssvar.files": [
+        "style/_variables.scss"
+    ],
+    "cssvar.ignore": [],
+    "cssvar.disableSort": true,
+    "cssvar.extensions": [
+        "css",
+        "scss",
+        "tsx",
+        "jsx"
+    ]
 }

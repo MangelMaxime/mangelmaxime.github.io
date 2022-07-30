@@ -25,6 +25,4 @@ let generate (ctx: SiteContents) (_projectRoot: string) (page: string) =
 
     | Some post ->
 
-        printfn "==== POST GENERATOR ====="
-        printfn "%A" post.content
         div [] [ str post.content ] |> Layout.mainPage ctx

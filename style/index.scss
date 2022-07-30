@@ -1,7 +1,32 @@
-.main {
+@use "./variables.scss";
 
-    .help {
-        background-color: red;
+// Default base line
+body {
+    line-height: 1.5;
+}
+
+// Prevent text overflow
+p,
+li,
+h1,
+h2,
+h3,
+h4 {
+  // Help prevent overflow of long words/names/URLs
+  overflow-wrap: break-word;
+
+  // Optional, not supported for all languages
+  hyphens: auto;
+}
+
+.site-footer {
+    display: flex;
+    justify-content: center;
+
+    .social {
+        display: flex;
+        flex-direction: row;
+        gap: var(--);
+        list-style: none;
     }
-
 }

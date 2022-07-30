@@ -23,6 +23,7 @@ type Post =
 
 type PostFrontMatter =
     {
+        layout : string
         title: string
         author: string option
         published: DateTime option
@@ -72,9 +73,6 @@ let private getLastModified (fileName: string) =
 
 let private loadFile (rootDir: string) (absolutePath: string) =
     let text = File.ReadAllText absolutePath
-
-    printfn "==== POST LOADER ====="
-    printfn "%A" text
 
     let relativePath =
         Path.relativePath rootDir absolutePath
