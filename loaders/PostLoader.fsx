@@ -9,6 +9,7 @@ open System.Diagnostics
 open System.Threading.Tasks
 open Legivel.Serialization
 open Helpers
+open Markdig
 
 type Post =
     {
@@ -17,6 +18,7 @@ type Post =
         title: string
         author: string option
         published: DateTime option
+        lastModified: DateTime
         tags: string list
         content: string
     }
@@ -70,6 +72,10 @@ let private getLastModified (fileName: string) =
     }
     |> Async.RunSynchronously
 
+let markdownPipeline =
+    MarkdownPipelineBuilder()
+        .UsePipeTables()
+        .Build()
 
 let private loadFile (rootDir: string) (absolutePath: string) =
     let text = File.ReadAllText absolutePath
@@ -79,8 +85,6 @@ let private loadFile (rootDir: string) (absolutePath: string) =
 
     let lines = text.Replace("\r\n", "\n").Split("\n")
 
-    let x = getLastModified absolutePath
-
     let firstLine = Array.tryHead lines
 
     if firstLine <> Some "---" then
@@ -88,16 +92,21 @@ let private loadFile (rootDir: string) (absolutePath: string) =
         None
 
     else
+        let lastModified = getLastModified absolutePath
+
         let lines = lines |> Array.skip 1
 
         let frontMatterLines =
             lines
             |> Array.takeWhile (fun line -> line <> "---")
 
-        let markdownContent =
+        let fileContent =
             lines
             |> Array.skip (frontMatterLines.Length + 1)
             |> String.concat "\n"
+
+        let markdownContent =
+            Markdown.ToHtml(fileContent, markdownPipeline)
 
         let frontMatterContent = frontMatterLines |> String.concat "\n"
 
@@ -121,9 +130,10 @@ let private loadFile (rootDir: string) (absolutePath: string) =
             {
                 relativeFile = relativePath
                 link = link
-                title = ""
+                title = "" 
                 author = None
                 published = frontMatter.Data.published
+                lastModified = lastModified
                 tags = frontMatter.Data.tags
                 content = markdownContent
             }

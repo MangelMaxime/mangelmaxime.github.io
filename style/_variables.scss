@@ -3,8 +3,13 @@
     --font-sans: "system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue",
     --font-mono: 'Consolas, Menlo, Monaco, "Liberation Mono", monospace';
 
-    /* Spacing logic */
-    --space-unit: 1rem;
+    /*
+        Spacing logic
+
+        Scaling follows the fibonacci sequence
+    */
+    /* Dynamic spacing */
+    --space-unit: 1em;
     --space-1: calc(0.25 * var(--space-unit));
     --space-2: calc(0.5 * var(--space-unit));
     --space-3: calc(0.75 * var(--space-unit));
@@ -13,19 +18,52 @@
     --space-6: calc(3.25 * var(--space-unit));
     --space-7: calc(5.25 * var(--space-unit));
 
+    /* Fixed spacing */
+    --space-unit-rem: 1rem;
+    --space-1-fixed: calc(0.25 * var(--space-unit-rem));
+    --space-2-fixed: calc(0.5 * var(--space-unit-rem));
+    --space-3-fixed: calc(0.75 * var(--space-unit-rem));
+    --space-4-fixed: calc(1.25 * var(--space-unit-rem));
+    --space-5-fixed: calc(2 * var(--space-unit-rem));
+    --space-6-fixed: calc(3.25 * var(--space-unit-rem));
+    --space-7-fixed: calc(5.25 * var(--space-unit-rem));
+
+    /*
+        Default spacing for the components
+        Using a variable make it easier to use the same spacing
+        for all the components without having to remember the actual value
+    */
+    --component-padding: var(--space-3);
+
     /* Text sizes */
     --text-base-size: 1rem;
-    --text-scale-ratio: 1.2; /* See https://type-scale.com/ for ideas on ratios */
+    /* See https://type-scale.com/ for ideas on ratios */
+    /* Ratio used for small screen */
+    --text-scale-ratio: 1.250;
+    /* Ratio used for desktop screen */
+    --text-scale-ratio-alt: 1.333;
 
     /* Type scale */
-    /* Lot of divisions and multiplications because there is no pow function in CSS */
-    --text-size-1: calc(var(--text-base-size) / (var(--text-scale-ratio) * var(--text-scale-ratio)));
-    --text-size-2: calc(var(--text-base-size) / var(--text-scale-ratio));
-    --text-size-3: calc(var(--text-base-size) * var(--text-scale-ratio));
-    --text-size-4: calc(var(--text-base-size) * (var(--text-scale-ratio) * var(--text-scale-ratio)));
-    --text-size-5: calc(var(--text-base-size) * (var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio)));
-    --text-size-6: calc(var(--text-base-size) * (var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio)));
-    --text-size-7: calc(var(--text-base-size) * (var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio)));
+    --text-size-4: calc(var(--text-base-size) * var(--text-scale-ratio));
+    --text-size-3: calc(var(--text-size-4) * var(--text-scale-ratio));
+    --text-size-2: calc(var(--text-size-3) * var(--text-scale-ratio));
+    --text-size-1: calc(var(--text-size-2) * var(--text-scale-ratio));
+
+    // --text-size-1: calc(1rem * (var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio)));
+    // --text-size-2: calc(1rem * (var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio)));
+    // --text-size-3: calc(1rem * (var(--text-scale-ratio) * var(--text-scale-ratio) * var(--text-scale-ratio)));
+    // --text-size-4: calc(1rem * (var(--text-scale-ratio) * var(--text-scale-ratio)));
+    // --text-size-5: calc(1rem * var(--text-scale-ratio));
+    // --text-size-6: calc(1rem / var(--text-scale-ratio));
+    // --text-size-7: calc(1rem / (var(--text-scale-ratio) * var(--text-scale-ratio)));
+    --text-vertical-spacing: 0.65em;
 
     --color-text-heading: lightpink;
+
+    /* Breakpoints */
+    --desktop: 1024px;
+    --tablet: 768px;
+    --mobile: 480px;
+
+    --footer-max-width: 960px;
 }

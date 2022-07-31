@@ -1,32 +1,60 @@
-@use "./variables.scss";
+@use "./_variables.scss";
+@use "./base/all.scss";
 
-// Default base line
 body {
-    line-height: 1.5;
-}
-
-// Prevent text overflow
-p,
-li,
-h1,
-h2,
-h3,
-h4 {
-  // Help prevent overflow of long words/names/URLs
-  overflow-wrap: break-word;
-
-  // Optional, not supported for all languages
-  hyphens: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .site-footer {
-    display: flex;
-    justify-content: center;
+    margin-top: auto;
+    padding: var(--space-3);
+
+    .site-footer-body {
+        display: flex;
+        justify-content: space-between;
+        max-width: 640px;
+        margin-right: auto;
+        margin-left: auto;
+    }
 
     .social {
+        list-style-type: none;
         display: flex;
-        flex-direction: row;
-        gap: var(--);
-        list-style: none;
+        gap: var(--space-3);
     }
+}
+
+
+.padding {
+    padding: var(--padding);
+}
+
+.p1 {
+    --padding: var(--space-1);
+}
+
+.p2 {
+    --padding: var(--space-2);
+}
+
+.p3 {
+    --padding: var(--space-3);
+}
+
+.p4 {
+    --padding: var(--space-4);
+}
+
+.p5 {
+    --padding: var(--space-5);
+}
+
+.p6 {
+    --padding: var(--space-6);
+}
+
+.p7 {
+    --padding: var(--space-7);
 }

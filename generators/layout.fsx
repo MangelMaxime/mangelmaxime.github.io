@@ -127,13 +127,15 @@ let mainPage (ctx: SiteContents) (pageContent: XmlNode) =
         body [] [
             pageContent
 
-            footer [ _class "site-footer" ] [
-                div [ _class "credit" ] [
-                    str "© 2022 Maxime"
-                ]
-                ul [ _class "social" ] [
-                    socialIcon "Twitter account" Icon.twitter ""
-                    socialIcon "Gitub repository" Icon.github ""
+            footer [ _class "site-footer container" ] [
+                div [ _class "site-footer-body" ] [
+                    div [ _class "credit" ] [
+                        str "© 2022 Maxime"
+                    ]
+                    ul [ _class "social" ] [
+                        socialIcon "Twitter account" Icon.twitter ""
+                        socialIcon "Gitub repository" Icon.github ""
+                    ]
                 ]
             ]
 

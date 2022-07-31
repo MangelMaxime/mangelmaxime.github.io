@@ -7,3 +7,4 @@ framework: net6.0
 nuget Giraffe.ViewEngine
 nuget Legivel
 nuget FsConfig
+nuget Markdig

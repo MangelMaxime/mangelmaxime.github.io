@@ -10,5 +10,6 @@
         "scss",
         "tsx",
         "jsx"
-    ]
+    ],
+    "editor.inlayHints.enabled": "offUnlessPressed"
 }

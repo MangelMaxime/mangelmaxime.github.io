@@ -25,4 +25,4 @@ let generate (ctx: SiteContents) (_projectRoot: string) (page: string) =
 
     | Some post ->
 
-        div [] [ str post.content ] |> Layout.mainPage ctx
+        div [] [ rawText post.content ] |> Layout.mainPage ctx

@@ -12,6 +12,7 @@ NUGET
       FSharp.Core (>= 5.0)
     Legivel (0.4.6)
       FSharp.Core (>= 4.6)
+    Markdig (0.30.2)
     Microsoft.Extensions.Configuration (6.0.1)
       Microsoft.Extensions.Configuration.Abstractions (>= 6.0)
       Microsoft.Extensions.Primitives (>= 6.0)

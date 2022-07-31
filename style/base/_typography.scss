@@ -1,0 +1,39 @@
+/* Fluid type - aka responsive typography */
+@media (min-width: var(--desktop)) {
+    :root {
+        --text-scale-ratio: var(--text-scale-ratio-alt);
+    }
+}
+
+/* Prevent text overflow */
+p,
+li,
+h1,
+h2,
+h3,
+h4 {
+    /* Help prevent overflow of long words/names/URLs */
+    overflow-wrap: break-word;
+
+    /* Optional, not supported for all languages */
+    hyphens: auto;
+
+    margin-top: 0;
+}
+
+p {
+    font-size: var(--text-base-size);
+}
+
+$text-levels: 4, 3, 2, 1;
+
+@each $level in $text-levels {
+    h#{$level},
+    .text-size-#{$level} {
+        font-size: var(--text-size-#{$level});
+        // This line-height value comes from
+        // https://kittygiraudel.com/2020/05/18/using-calc-to-figure-out-optimal-line-height/
+        line-height: calc(2px + 2ex + 2px);
+        margin-bottom: var(--text-vertical-spacing);
+    }
+}
