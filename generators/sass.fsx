@@ -1,4 +1,4 @@
-#r "../_lib/Fornax.Core.dll"
+#r "/home/mmangel/Workspaces/Github/ionide/Fornax/src/Fornax/bin/Debug/net5.0/Fornax.Core.dll"
 #load "../utils/Log.fsx"
 
 open System.Diagnostics
@@ -21,12 +21,7 @@ let generate (ctx: SiteContents) (projectRoot: string) (page: string) =
         p.Start() |> ignore
 
         let outTask =
-            Task.WhenAll(
-                [|
-                    p.StandardOutput.ReadToEndAsync()
-                    p.StandardError.ReadToEndAsync()
-                |]
-            )
+            Task.WhenAll([| p.StandardOutput.ReadToEndAsync(); p.StandardError.ReadToEndAsync() |])
 
         do! p.WaitForExitAsync() |> Async.AwaitTask
         let! result = outTask |> Async.AwaitTask

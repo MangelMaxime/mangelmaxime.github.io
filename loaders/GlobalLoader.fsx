@@ -1,19 +1,17 @@
-#r "../_lib/Fornax.Core.dll"
+#r "/home/mmangel/Workspaces/Github/ionide/Fornax/src/Fornax/bin/Debug/net5.0/Fornax.Core.dll"
 
-type SiteInfo =
-    {
-        title: string
-        description: string
-        postPageSize: int
-    }
+type SiteInfo = {
+    title: string
+    description: string
+    postPageSize: int
+}
 
 let loader (projectRoot: string) (siteContent: SiteContents) =
-    let siteInfo =
-        {
-            title = "Sample Fornax blog"
-            description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-            postPageSize = 5
-        }
+    let siteInfo = {
+        title = "Sample Fornax blog"
+        description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        postPageSize = 5
+    }
 
     siteContent.Add(siteInfo)
 

@@ -1,4 +1,4 @@
-#r "../_lib/Fornax.Core.dll"
+#r "/home/mmangel/Workspaces/Github/ionide/Fornax/src/Fornax/bin/Debug/net5.0/Fornax.Core.dll"
 
 open System.IO
 

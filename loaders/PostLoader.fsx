@@ -1,4 +1,4 @@
-#r "../_lib/Fornax.Core.dll"
+#r "/home/mmangel/Workspaces/Github/ionide/Fornax/src/Fornax/bin/Debug/net5.0/Fornax.Core.dll"
 #load "../.paket/load/main.group.fsx"
 #load "../utils/Log.fsx"
 #load "../utils/Helpers.fsx"
@@ -11,26 +11,24 @@ open Legivel.Serialization
 open Helpers
 open Markdig
 
-type Post =
-    {
-        relativeFile: string
-        link : string
-        title: string
-        author: string option
-        published: DateTime option
-        lastModified: DateTime
-        tags: string list
-        content: string
-    }
+type Post = {
+    relativeFile: string
+    link: string
+    title: string
+    author: string option
+    published: DateTime option
+    lastModified: DateTime
+    tags: string list
+    content: string
+}
 
-type PostFrontMatter =
-    {
-        layout : string
-        title: string
-        author: string option
-        published: DateTime option
-        tags: string list
-    }
+type PostFrontMatter = {
+    layout: string
+    title: string
+    author: string option
+    published: DateTime option
+    tags: string list
+}
 
 let contentDir = "posts"
 
@@ -50,12 +48,7 @@ let private getLastModified (fileName: string) =
         p.Start() |> ignore
 
         let outTask =
-            Task.WhenAll(
-                [|
-                    p.StandardOutput.ReadToEndAsync()
-                    p.StandardError.ReadToEndAsync()
-                |]
-            )
+            Task.WhenAll([| p.StandardOutput.ReadToEndAsync(); p.StandardError.ReadToEndAsync() |])
 
         do! p.WaitForExitAsync() |> Async.AwaitTask
         let! result = outTask |> Async.AwaitTask
@@ -72,16 +65,12 @@ let private getLastModified (fileName: string) =
     }
     |> Async.RunSynchronously
 
-let markdownPipeline =
-    MarkdownPipelineBuilder()
-        .UsePipeTables()
-        .Build()
+let markdownPipeline = MarkdownPipelineBuilder().UsePipeTables().Build()
 
 let private loadFile (rootDir: string) (absolutePath: string) =
     let text = File.ReadAllText absolutePath
 
-    let relativePath =
-        Path.relativePath rootDir absolutePath
+    let relativePath = Path.relativePath rootDir absolutePath
 
     let lines = text.Replace("\r\n", "\n").Split("\n")
 
@@ -96,23 +85,16 @@ let private loadFile (rootDir: string) (absolutePath: string) =
 
         let lines = lines |> Array.skip 1
 
-        let frontMatterLines =
-            lines
-            |> Array.takeWhile (fun line -> line <> "---")
+        let frontMatterLines = lines |> Array.takeWhile (fun line -> line <> "---")
 
         let fileContent =
-            lines
-            |> Array.skip (frontMatterLines.Length + 1)
-            |> String.concat "\n"
+            lines |> Array.skip (frontMatterLines.Length + 1) |> String.concat "\n"
 
-        let markdownContent =
-            Markdown.ToHtml(fileContent, markdownPipeline)
+        let markdownContent = Markdown.ToHtml(fileContent, markdownPipeline)
 
         let frontMatterContent = frontMatterLines |> String.concat "\n"
 
-        let frontMatterResult =
-            Deserialize<PostFrontMatter> frontMatterContent
-            |> List.head
+        let frontMatterResult = Deserialize<PostFrontMatter> frontMatterContent |> List.head
 
         match frontMatterResult with
         | Error error ->
@@ -124,13 +106,12 @@ let private loadFile (rootDir: string) (absolutePath: string) =
                 for warning in frontMatter.Warn do
                     Log.warn $"Warning in file '%s{relativePath}': %A{warning}"
 
-            let link =
-                Path.ChangeExtension(relativePath, "html")
+            let link = Path.ChangeExtension(relativePath, "html")
 
             {
                 relativeFile = relativePath
                 link = link
-                title = "" 
+                title = ""
                 author = None
                 published = frontMatter.Data.published
                 lastModified = lastModified

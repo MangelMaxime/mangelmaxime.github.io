@@ -1,7 +1,8 @@
-#r "../_lib/Fornax.Core.dll"
+#r "/home/mmangel/Workspaces/Github/ionide/Fornax/src/Fornax/bin/Debug/net5.0/Fornax.Core.dll"
 #load "layout.fsx"
 
-open Giraffe.ViewEngine
+// open Giraffe.ViewEngine
+open type Feliz.ViewEngine.Html
 
 let generate (ctx: SiteContents) (_projectRoot: string) (page: string) =
 
@@ -12,12 +13,11 @@ let generate (ctx: SiteContents) (_projectRoot: string) (page: string) =
 
     match postOpt with
     | None ->
-        let error =
-            {
-                Path = page
-                Message = $"Post %s{page} not found in the context"
-                Phase = Generating
-            }
+        let error = {
+            Path = page
+            Message = $"Post %s{page} not found in the context"
+            Phase = Generating
+        }
 
         ctx.AddError error
 
@@ -25,4 +25,4 @@ let generate (ctx: SiteContents) (_projectRoot: string) (page: string) =
 
     | Some post ->
 
-        div [] [ rawText post.content ] |> Layout.mainPage ctx
+        div [ rawText post.content ] |> Layout.mainPage ctx

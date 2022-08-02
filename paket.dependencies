@@ -8,3 +8,4 @@ nuget Giraffe.ViewEngine
 nuget Legivel
 nuget FsConfig
 nuget Markdig
+nuget Feliz.ViewEngine

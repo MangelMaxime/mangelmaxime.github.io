@@ -3,6 +3,8 @@ STORAGE: NONE
 RESTRICTION: == net6.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
+    Feliz.ViewEngine (0.24)
+      FSharp.Core (>= 4.7)
     FsConfig (3.1)
       FSharp.Core (>= 5.0)
       Microsoft.Extensions.Configuration (>= 5.0)

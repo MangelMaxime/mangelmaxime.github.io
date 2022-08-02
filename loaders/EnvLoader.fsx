@@ -1,4 +1,4 @@
-#r "../_lib/Fornax.Core.dll"
+#r "/home/mmangel/Workspaces/Github/ionide/Fornax/src/Fornax/bin/Debug/net5.0/Fornax.Core.dll"
 #load "../.paket/load/main.group.fsx"
 #load "../utils/Log.fsx"
 
@@ -9,10 +9,9 @@ type Env =
     | Prod
 
 [<Convention("FORNAX")>]
-type EnvInfo =
-    {
-        Env: Env
-    }
+type EnvInfo = {
+    Env: Env
+}
 
 let loader (projectRoot: string) (siteContent: SiteContents) =
 

@@ -12,5 +12,7 @@ indent_size = 2
 
 [*.{fs,fsx}]
 fsharp_max_record_width=0
+fsharp_max_array_or_list_width=0
 fsharp_multiline_block_brackets_on_same_column=true
 fsharp_bar_before_discriminated_union_declaration=true
+fsharp_experimental_stroustrup_style=true

@@ -35,5 +35,6 @@ $text-levels: 4, 3, 2, 1;
         // https://kittygiraudel.com/2020/05/18/using-calc-to-figure-out-optimal-line-height/
         line-height: calc(2px + 2ex + 2px);
         margin-bottom: var(--text-vertical-spacing);
+        font-weight: var(--header-font-weight);
     }
 }

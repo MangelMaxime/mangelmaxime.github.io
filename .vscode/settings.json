@@ -4,7 +4,7 @@
         "style/_variables.scss"
     ],
     "cssvar.ignore": [],
-    "cssvar.disableSort": true,
+    "cssvar.disableSort": false,
     "cssvar.extensions": [
         "css",
         "scss",

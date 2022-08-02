@@ -10,51 +10,44 @@ body {
 .site-footer {
     margin-top: auto;
     padding: var(--space-3);
+    background-color: var(--color-primary);
+    color: #fff;
+    text-align: center;
 
-    .site-footer-body {
+    &--copyright {
         display: flex;
-        justify-content: space-between;
-        max-width: 640px;
-        margin-right: auto;
-        margin-left: auto;
+        justify-content: center;
+        align-items: center;
     }
 
-    .social {
+    &--social {
         list-style-type: none;
         display: flex;
         gap: var(--space-3);
+        align-items: center;
+        justify-content: center;
+        margin-top: var(--space-standard);
+        margin-bottom: var(--space-standard);
     }
 }
 
-
-.padding {
-    padding: var(--padding);
+.container {
+    // max-width: var(--content-max-width);
+    // width: 100%;
+    // margin-right: auto;
+    // margin-left: auto;
+    // padding-left: var(--space-standard);
+    // padding-right: var(--space-standard);
+    width: min(100% - var(--space-standard) * 2, var(--content-max-width, 60ch));
+    margin-inline: auto;
 }
 
-.p1 {
-    --padding: var(--space-1);
-}
-
-.p2 {
-    --padding: var(--space-2);
-}
-
-.p3 {
-    --padding: var(--space-3);
-}
-
-.p4 {
-    --padding: var(--space-4);
-}
-
-.p5 {
-    --padding: var(--space-5);
-}
-
-.p6 {
-    --padding: var(--space-6);
-}
-
-.p7 {
-    --padding: var(--space-7);
+.icon {
+    aspect-ratio: 1;
+    font-size: var(--text-size-3);
+    width: var(--text-size-3);
+    display: inline-grid;
+    line-height: 1.1;
+    place-content: center;
+    text-align: center;
 }

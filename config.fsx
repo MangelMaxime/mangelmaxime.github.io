@@ -1,4 +1,4 @@
-#r "_lib/Fornax.Core.dll"
+#r "/home/mmangel/Workspaces/Github/ionide/Fornax/src/Fornax/bin/Debug/net5.0/Fornax.Core.dll"
 
 open Config
 open System.IO
@@ -10,8 +10,7 @@ let postPredicate (projectRoot: string, page: string) =
     if ext = ".md" then
         let ctn = File.ReadAllText fileName
 
-        page.Contains("_public") |> not
-        && ctn.Contains("layout: post")
+        page.Contains("_public") |> not && ctn.Contains("layout: post")
     else
         false
 
@@ -49,29 +48,28 @@ let staticPredicate (projectRoot: string, page: string) =
 
     fileShouldBeExcluded |> not
 
-let config =
-    {
-        Generators =
-            [
-                {
-                    Script = "sass.fsx"
-                    Trigger = OnFile "style/index.scss"
-                    OutputFile = NewFileName "style.css"
-                }
-                {
-                    Script = "post.fsx"
-                    Trigger = OnFilePredicate postPredicate
-                    OutputFile = ChangeExtension "html"
-                }
-                {
-                    Script = "staticfile.fsx"
-                    Trigger = OnFilePredicate staticPredicate
-                    OutputFile = SameFileName
-                }
-                {
-                    Script = "index.fsx"
-                    Trigger = Once
-                    OutputFile = NewFileName "index.html"
-                }
-            ]
-    }
+let config = {
+    Generators =
+        [
+            {
+                Script = "sass.fsx"
+                Trigger = OnFile "style/index.scss"
+                OutputFile = NewFileName "style.css"
+            }
+            {
+                Script = "post.fsx"
+                Trigger = OnFilePredicate postPredicate
+                OutputFile = ChangeExtension "html"
+            }
+            {
+                Script = "staticfile.fsx"
+                Trigger = OnFilePredicate staticPredicate
+                OutputFile = SameFileName
+            }
+            {
+                Script = "index.fsx"
+                Trigger = Once
+                OutputFile = NewFileName "index.html"
+            }
+        ]
+}

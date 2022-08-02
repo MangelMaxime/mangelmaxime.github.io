@@ -16,11 +16,8 @@ module Path =
 
         // Remove the rootDir from the fullFilePath
         let relativeDir =
-            fullFilePath
-            |> Path.GetDirectoryName
-            |> fun x -> x.[chopLength..]
+            fullFilePath |> Path.GetDirectoryName |> (fun x -> x.[chopLength..])
 
-        let fileName =
-            Path.GetFileName fullFilePath
+        let fileName = Path.GetFileName fullFilePath
 
         Path.Combine(relativeDir, fileName)
