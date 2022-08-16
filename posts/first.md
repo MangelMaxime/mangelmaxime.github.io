@@ -21,7 +21,6 @@ File is updated 2
 
 <h5> This is my fifth title </h5>
 
-<h6> This is my sixth title </h6> 
+<h6> This is my sixth title </h6>
 
 # Markdown title
-  

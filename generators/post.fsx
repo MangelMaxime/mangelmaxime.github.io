@@ -1,15 +1,15 @@
-#r "/home/mmangel/Workspaces/GitHub/ionide/Fornax/src/Fornax/bin/Debug/net5.0/Fornax.Core.dll"
+#r "C:\\Users\\mange\\Workspaces\\Github\\ionide\\Fornax\\src\\Fornax\\bin\\Debug\\net5.0\\Fornax.Core.dll"
 #load "layout.fsx"
 
 // open Giraffe.ViewEngine
 open type Feliz.ViewEngine.Html
+open Helpers
 
 let generate (ctx: SiteContents) (_projectRoot: string) (page: string) =
-
     let postOpt =
         ctx.TryGetValues<PostLoader.Post>()
         |> Option.defaultValue Seq.empty
-        |> Seq.tryFind (fun post -> post.relativeFile = page)
+        |> Seq.tryFind (fun post -> post.relativeFile = Path.normalize page)
 
     match postOpt with
     | None ->

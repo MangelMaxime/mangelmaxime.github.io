@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Log.fs" />
+    <Compile Include="Watcher.fs" />
+    <Compile Include="Server.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Static.Core\FSharp.Static.Core.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Argu" Version="6.1.1" />
+    <PackageReference Include="Saturn" Version="0.16.1" />
+    <PackageReference Include="Spectre.Console" Version="0.44.0" />
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
+  </ItemGroup>
+  <!-- <Import Project="..\..\.paket\Paket.Restore.targets" /> -->
+</Project>

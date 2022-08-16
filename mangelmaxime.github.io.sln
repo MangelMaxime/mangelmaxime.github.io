@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{08A80AC1-3F40-4BB7-A7CC-7B1F37537A4F}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Static", "src\FSharp.Static\FSharp.Static.fsproj", "{F5F8FE34-C215-433F-85E2-2955A23693C2}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Static.Core", "src\FSharp.Static.Core\FSharp.Static.Core.fsproj", "{CC6CB40E-B7E8-4735-99FB-2E7BC9249019}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F5F8FE34-C215-433F-85E2-2955A23693C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5F8FE34-C215-433F-85E2-2955A23693C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5F8FE34-C215-433F-85E2-2955A23693C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5F8FE34-C215-433F-85E2-2955A23693C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC6CB40E-B7E8-4735-99FB-2E7BC9249019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC6CB40E-B7E8-4735-99FB-2E7BC9249019}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC6CB40E-B7E8-4735-99FB-2E7BC9249019}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC6CB40E-B7E8-4735-99FB-2E7BC9249019}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F5F8FE34-C215-433F-85E2-2955A23693C2} = {08A80AC1-3F40-4BB7-A7CC-7B1F37537A4F}
+		{CC6CB40E-B7E8-4735-99FB-2E7BC9249019} = {08A80AC1-3F40-4BB7-A7CC-7B1F37537A4F}
+	EndGlobalSection
+EndGlobal

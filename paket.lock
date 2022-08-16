@@ -1,3 +1,6 @@
+
+
+GROUP Docs
 GENERATE-LOAD-SCRIPTS: ON
 STORAGE: NONE
 RESTRICTION: == net6.0
@@ -25,3 +28,29 @@ NUGET
     System.Runtime.CompilerServices.Unsafe (6.0)
     TypeShape (10.0)
       FSharp.Core (>= 4.5.4)
+
+GROUP FSharp.Static
+STORAGE: NONE
+RESTRICTION: == net6.0
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    Argu (6.1.1)
+      FSharp.Core (>= 4.3.2)
+      System.Configuration.ConfigurationManager (>= 4.4)
+    FSharp.Core (6.0.5) - content: none
+    Microsoft.Win32.SystemEvents (6.0.1)
+    Spectre.Console (0.44)
+    Suave (2.6.2)
+      FSharp.Core
+    System.Configuration.ConfigurationManager (6.0)
+      System.Security.Cryptography.ProtectedData (>= 6.0)
+      System.Security.Permissions (>= 6.0)
+    System.Drawing.Common (6.0)
+      Microsoft.Win32.SystemEvents (>= 6.0)
+    System.Security.AccessControl (6.0)
+    System.Security.Cryptography.ProtectedData (6.0)
+    System.Security.Permissions (6.0)
+      System.Security.AccessControl (>= 6.0)
+      System.Windows.Extensions (>= 6.0)
+    System.Windows.Extensions (6.0)
+      System.Drawing.Common (>= 6.0)

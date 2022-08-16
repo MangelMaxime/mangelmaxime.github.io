@@ -5,3 +5,5 @@ node_modules/
 
 # Force us to regenate the CSS to be sure it's up to date
 style/pollen.scss
+bin/
+obj/

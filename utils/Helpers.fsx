@@ -21,3 +21,4 @@ module Path =
         let fileName = Path.GetFileName fullFilePath
 
         Path.Combine(relativeDir, fileName)
+        |> normalize

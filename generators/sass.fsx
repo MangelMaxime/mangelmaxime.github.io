@@ -1,4 +1,4 @@
-#r "/home/mmangel/Workspaces/GitHub/ionide/Fornax/src/Fornax/bin/Debug/net5.0/Fornax.Core.dll"
+#r "C:\\Users\\mange\\Workspaces\\Github\\ionide\\Fornax\\src\\Fornax\\bin\\Debug\\net5.0\\Fornax.Core.dll"
 #load "../utils/Log.fsx"
 
 open System.Diagnostics
@@ -8,7 +8,7 @@ let generate (ctx: SiteContents) (projectRoot: string) (page: string) =
 
     async {
         let psi = ProcessStartInfo()
-        psi.FileName <- "dart-sass/linux-x64/sass"
+        psi.FileName <- "dart-sass/win-x64/sass.bat"
         psi.Arguments <- page
         psi.RedirectStandardError <- true
         psi.RedirectStandardOutput <- true

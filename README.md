@@ -28,3 +28,8 @@ The ideas of using `em` for margins/paddings is that they will stay proportional
 Numbers of characters per lines:
 - Desktop: around 60
 - Mobile: around 30-40
+
+### Icons
+
+- Use [Simple Icons](https://simpleicons.org/) for brand icons
+- Use [Lucide](https://lucide.dev/) for generic icons
