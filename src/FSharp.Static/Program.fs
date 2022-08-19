@@ -10,15 +10,13 @@ open System
 // open Suave.Logging
 open System.IO
 open Spectre.Console
-open System.Reactive
-open System.Reactive.Linq
-open System.Reactive.Subjects
 open Saturn
 open Giraffe
 open Microsoft.Extensions.Logging
-open System.Collections.Generic
-
-let x = new Subject<string>()
+open FSharp.Static.Server
+open FSharp.Static.Core
+open System.Diagnostics
+open FSharp.Static.Evaluator
 
 // open Suave.Sockets
 // open Suave.Sockets.Control
@@ -67,73 +65,45 @@ let private createFileWatch (root: string) handler =
 
 // open Microsoft.Extensions.Logging
 
-type ColorConsoleLoggerConfiguration() =
-
-    let _logLevels = new Dictionary<LogLevel, ConsoleColor>()
-
-    do _logLevels.Add(LogLevel.Information, ConsoleColor.Green)
-
-    member _.EventId: int = unbox null
-
-    member _.LogLevels: Dictionary<LogLevel, ConsoleColor> = _logLevels
-
-
-type MyLogger
-    (
-        name: string,
-        getCurrentConfig: Func<unit, ColorConsoleLoggerConfiguration>
-    ) =
-
-    member _.IsEnabled(logLevel: LogLevel) =
-        getCurrentConfig.Invoke().LogLevels.ContainsKey(logLevel)
-
-    interface ILogger with
-
-        member _.BeginScope<'TState>(state: 'TState) = null
-
-        member this.IsEnabled(logLevel: LogLevel) = this.IsEnabled logLevel
-
-        member this.Log<'TState>
-            (
-                logLevel: LogLevel,
-                eventId: EventId,
-                state: 'TState,
-                exn: Exception,
-                formatter: Func<'TState, Exception, string>
-            ) =
-            if this.IsEnabled(logLevel) then
-                let config = getCurrentConfig.Invoke()
-
-                if (config.EventId = 0 || config.EventId = eventId.Id) then
-                    let originalColor = Console.ForegroundColor
-
-                    Console.ForegroundColor <- config.LogLevels[logLevel]
-                    Console.WriteLine($"[{eventId.Id, 2}: {logLevel, -12}]")
-
-                    Console.ForegroundColor <- originalColor
-                    Console.Write($"     {name} - ")
-
-                    Console.ForegroundColor <- config.LogLevels[logLevel]
-                    Console.Write($"{formatter.Invoke(state, exn)}")
-
-                    Console.ForegroundColor <- originalColor
-                    Console.WriteLine()
-
-            else
-                ()
-
-
 let app =
     application {
         url "http://localhost:8080"
         use_router (text "Hello world from Saturn")
+
         logging (fun builder ->
-            // builder.ClearProviders()
-            //     .AddColorConsoleLogger(con)
-            // // logger.SetMinimumLevel LogLevel.None |> ignore
-            ()
+            builder
+                .ClearProviders()
+                .AddColorConsoleLogger(fun configuration ->
+                    // Replace warning value from appsettings.json of "Cyan"
+                    configuration.LogLevels[
+                        LogLevel.Warning
+                    ] <- ConsoleColor.DarkCyan
+                    // Replace warning value from appsettings.json of "Red"
+                    configuration.LogLevels[
+                        LogLevel.Error
+                    ] <- ConsoleColor.DarkRed
+                )
+            |> ignore
+        // logger.SetMinimumLevel LogLevel.None |> ignore
         )
     }
+
+let private loadLoaders (projectRoot : ProjectRoot.T) (context : Context) =
+
+    let loaders =
+        Directory.GetFiles(
+            Path.Combine(ProjectRoot.toString projectRoot, "loaders"),
+            "*.fsx"
+        )
+        |> Seq.map AbsolutePath.create
+
+    // Stop on first error
+    for loader in loaders do
+        match LoaderEvaluator.tryEvaluate loader context with
+        | Ok () ->
+            ()
+        | Error error ->
+            Log.error error
 
 [<EntryPoint>]
 let main argv =
@@ -157,17 +127,17 @@ let main argv =
     // if results.Length = 0 then
 
     // Server.create 8080 signalUpdate |> Async.AwaitTask |> Async.StartImmediate
-    async { run app } |> Async.Start
+    // async { run app } |> Async.Start
 
-    printfn "%A" (Directory.GetCurrentDirectory())
-    printfn "New file"
+    let projectRoot = ProjectRoot.create (Directory.GetCurrentDirectory())
+
+    Log.info $"CWD: {ProjectRoot.toString projectRoot}"
+
+    let context = new Context(projectRoot, true, Log.error)
 
     use configWatcher =
-        // createFileWatch (Directory.GetCurrentDirectory()) (fun event ->
-        //     printfn $"%A{event.ChangeType} - %A{event.FullPath} - %A{event.Name}"
-        // )
         Watcher.createWithFilters
-            (Directory.GetCurrentDirectory())
+            (ProjectRoot.toString projectRoot)
             [
                 "config.fsx"
             ]
@@ -176,8 +146,25 @@ let main argv =
                 |> Seq.iter (fun _ ->
                     AnsiConsole.Clear()
                     Log.info "Configuration changed - Restarting..."
+
+                    match ConfigEvaluator.tryEvaluate context with
+                    | Ok config ->
+                        Log.debug "ok config"
+                        context.Add config
+                    | Error error -> Log.error error
+
                 )
             )
+
+    match ConfigEvaluator.tryEvaluate context with
+    | Ok config ->
+        Log.info "Config loaded"
+        context.Add config
+
+        loadLoaders projectRoot context
+
+
+    | Error error -> Log.error error
 
     // Keep the program alive until the user presses Ctrl+C
     Console.CancelKeyPress.AddHandler(fun _ ea ->
@@ -188,7 +175,5 @@ let main argv =
 
     while true do
         System.Console.ReadKey(true) |> ignore
-        printfn "fake trigger"
-        signalUpdate.Trigger()
 
     0

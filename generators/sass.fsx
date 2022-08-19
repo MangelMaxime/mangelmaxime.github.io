@@ -1,10 +1,10 @@
-#r "C:\\Users\\mange\\Workspaces\\Github\\ionide\\Fornax\\src\\Fornax\\bin\\Debug\\net5.0\\Fornax.Core.dll"
+#r "./src/FSharp.Static/bin/Debug/net6.0/FSharp.Static.Core.dll"
 #load "../utils/Log.fsx"
 
 open System.Diagnostics
 open System.Threading.Tasks
 
-let generate (ctx: SiteContents) (projectRoot: string) (page: string) =
+let generate (ctx: SiteContents) (projectRoot: ProjectRoot.T) (page: string) =
 
     async {
         let psi = ProcessStartInfo()

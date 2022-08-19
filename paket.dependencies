@@ -1,8 +1,8 @@
 group Docs
+    generate_load_scripts: true
     storage: none
     framework: net6.0
     source https://api.nuget.org/v3/index.json
-    generate_load_scripts: true
 
     nuget Giraffe.ViewEngine
     nuget Legivel
@@ -17,6 +17,8 @@ group FSharp.Static
 
     nuget FSharp.Core content: none
     nuget Argu
-    nuget Spectre.Console
-    nuget Suave
     nuget Saturn
+    nuget Spectre.Console
+    nuget FSharp.Compiler.Service
+    nuget FsToolkit.ErrorHandling
+    nuget FSharp.Quotations.Evaluator

@@ -1,7 +1,7 @@
-#r "C:\\Users\\mange\\Workspaces\\Github\\ionide\\Fornax\\src\\Fornax\\bin\\Debug\\net5.0\\Fornax.Core.dll"
+#r "./src/FSharp.Static/bin/Debug/net6.0/FSharp.Static.Core.dll"
 
 open System.IO
 
-let generate (ctx: SiteContents) (projectRoot: string) (page: string) =
+let generate (ctx: SiteContents) (projectRoot: ProjectRoot.T) (page: string) =
     let inputPath = Path.Combine(projectRoot, page)
     File.ReadAllBytes inputPath

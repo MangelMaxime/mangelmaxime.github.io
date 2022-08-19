@@ -1,29 +1,38 @@
-#r "C:\\Users\\mange\\Workspaces\\Github\\ionide\\Fornax\\src\\Fornax\\bin\\Debug\\net5.0\\Fornax.Core.dll"
-#load "../.paket/load/main.group.fsx"
+#r "./../src/FSharp.Static/bin/Debug/net6.0/FSharp.Static.Core.dll"
+#load "../.paket/load/net6.0/Docs/docs.group.fsx"
 #load "../utils/Log.fsx"
 
 open FsConfig
+open FSharp.Static.Core
 
 type Env =
     | Dev
     | Prod
 
 [<Convention("FORNAX")>]
-type EnvInfo = {
-    Env: Env
-}
+type EnvInfo =
+    {
+        Env: Env
+    }
 
-let loader (projectRoot: string) (siteContent: SiteContents) =
+let loader (context: Context) : unit =
 
-    match EnvConfig.Get<EnvInfo>() with
-    | Ok config -> siteContent.Add config
+    // match EnvConfig.Get<EnvInfo>() with
+    // | Ok config -> siteContext.Add config
 
-    | Error error ->
-        match error with
-        | NotFound envVarName -> Log.error $"Environment variable %s{envVarName} not found"
-        | BadValue (envVarName, value) -> Log.error $"Environment variable %s{envVarName} has invalid value: %s{value}"
-        | NotSupported msg -> Log.error $"Environment variable not supported: %s{msg}"
+    // | Error error ->
+    //     match error with
+    //     | NotFound envVarName ->
+    //         siteContext.LogError
+    //             $"Environment variable %s{envVarName} not found"
+    //     | BadValue (envVarName, value) ->
+    //         siteContext.LogError
+    //             $"Environment variable %s{envVarName} has invalid value: %s{value}"
+    //     | NotSupported msg ->
+    //         siteContext.LogError $"Environment variable not supported: %s{msg}"
 
-        System.Environment.Exit(1)
+    //     System.Environment.Exit(1)
 
-    siteContent
+    printfn "ProjectRoot: %A" context.ProjectRoot
+
+    ()

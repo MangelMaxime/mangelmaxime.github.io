@@ -1,4 +1,4 @@
-#r "C:\\Users\\mange\\Workspaces\\Github\\ionide\\Fornax\\src\\Fornax\\bin\\Debug\\net5.0\\Fornax.Core.dll"
+#r "./src/FSharp.Static/bin/Debug/net6.0/FSharp.Static.Core.dll"
 #load "layout.fsx"
 
 // open Giraffe.ViewEngine

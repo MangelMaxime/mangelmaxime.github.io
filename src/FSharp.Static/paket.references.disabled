@@ -1,5 +1,0 @@
-group FSharp.Static
-    FSharp.Core
-    Argu
-    Spectre.Console
-    Saturn

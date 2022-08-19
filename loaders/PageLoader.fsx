@@ -1,16 +1,16 @@
-#r "C:\\Users\\mange\\Workspaces\\Github\\ionide\\Fornax\\src\\Fornax\\bin\\Debug\\net5.0\\Fornax.Core.dll"
+#r "./../src/FSharp.Static/bin/Debug/net6.0/FSharp.Static.Core.dll"
+#load "../.paket/load/net6.0/Docs/docs.group.fsx"
 
+open FSharp.Static.Core
 type Page = {
     title: string
     link: string
 }
 
-let loader (projectRoot: string) (siteContent: SiteContents) =
-    siteContent.Add(
+let loader (context: Context) =
+    context.Add(
         {
             title = "Home"
             link = "/"
         }
     )
-
-    siteContent

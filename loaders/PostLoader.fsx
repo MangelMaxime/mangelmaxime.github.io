@@ -1,7 +1,9 @@
-#r "C:\\Users\\mange\\Workspaces\\Github\\ionide\\Fornax\\src\\Fornax\\bin\\Debug\\net5.0\\Fornax.Core.dll"
-#load "../.paket/load/main.group.fsx"
+#r "./../src/FSharp.Static/bin/Debug/net6.0/FSharp.Static.Core.dll"
+#load "../.paket/load/net6.0/Docs/docs.group.fsx"
 #load "../utils/Log.fsx"
 #load "../utils/Helpers.fsx"
+
+open FSharp.Static.Core
 
 open System
 open System.IO
@@ -120,17 +122,16 @@ let private loadFile (rootDir: string) (absolutePath: string) =
             }
             |> Some
 
-let loader (projectRoot: string) (siteContent: SiteContents) =
-    let postsPath = Path.Combine(projectRoot, contentDir)
-    let options = EnumerationOptions(RecurseSubdirectories = true)
-    let files = Directory.GetFiles(postsPath, "*", options)
+let loader (context: Context) =
+    // let postsPath = Path.Combine(ProjectRoot.toString projectRoot, contentDir)
+    // let options = EnumerationOptions(RecurseSubdirectories = true)
+    // let files = Directory.GetFiles(postsPath, "*", options)
 
-    files
-    |> Array.filter (fun n -> n.EndsWith ".md")
-    |> Array.map (loadFile projectRoot)
-    // Only keep the valid post to avoid to propagate errors
-    |> Array.filter Option.isSome
-    |> Array.map Option.get
-    |> Array.iter siteContent.Add
-
-    siteContent
+    // files
+    // |> Array.filter (fun n -> n.EndsWith ".md")
+    // |> Array.map (loadFile (ProjectRoot.toString projectRoot))
+    // // Only keep the valid post to avoid to propagate errors
+    // |> Array.filter Option.isSome
+    // |> Array.map Option.get
+    // |> Array.iter siteContext.Add
+    ()
