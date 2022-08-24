@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="UserContentModel">
+    <attachedFolders />
+    <explicitIncludes>
+      <Path>.config</Path>
+      <Path>.editorconfig</Path>
+      <Path>.fantomasignore</Path>
+      <Path>.gitignore</Path>
+      <Path>.pollenrc.js</Path>
+      <Path>.postcssrc.js</Path>
+      <Path>README.md</Path>
+      <Path>config.fsx</Path>
+      <Path>docs</Path>
+      <Path>generators</Path>
+      <Path>images</Path>
+      <Path>loaders</Path>
+      <Path>package-lock.json</Path>
+      <Path>package.json</Path>
+      <Path>paket.dependencies</Path>
+      <Path>paket.lock</Path>
+      <Path>style</Path>
+      <Path>utils</Path>
+    </explicitIncludes>
+    <explicitExcludes />
+  </component>
+</project>

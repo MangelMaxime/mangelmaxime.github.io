@@ -9,4 +9,4 @@ bin/
 obj/
 
 .idea/*
-.idea/.idea.mangelmaxime.github.io/.idea/indexLayout.xml
+!.idea/.idea.mangelmaxime.github.io/.idea/indexLayout.xml
