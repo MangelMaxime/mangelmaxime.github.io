@@ -22,3 +22,4 @@ group FSharp.Static
     nuget FSharp.Compiler.Service
     nuget FsToolkit.ErrorHandling
     nuget FSharp.Quotations.Evaluator
+    nuget Legivel

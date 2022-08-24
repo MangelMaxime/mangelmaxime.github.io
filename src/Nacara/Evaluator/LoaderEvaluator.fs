@@ -1,14 +1,7 @@
-namespace FSharp.Static.Evaluator
+namespace Nacara.Evaluator
 
-open FSharp.Compiler.Diagnostics
-open FSharp.Compiler.Interactive.Shell
-open FSharp.Quotations.Evaluator
-open FSharp.Reflection
-open System.Text
-open System
-open System.IO
 open FsToolkit.ErrorHandling
-open FSharp.Static.Core
+open Nacara.Core
 open System.Reflection
 
 [<RequireQualifiedAccess>]

@@ -9,12 +9,14 @@
       <Path>.gitignore</Path>
       <Path>.pollenrc.js</Path>
       <Path>.postcssrc.js</Path>
+      <Path>.vscode</Path>
       <Path>README.md</Path>
-      <Path>config.fsx</Path>
       <Path>docs</Path>
       <Path>generators</Path>
       <Path>images</Path>
+      <Path>layouts</Path>
       <Path>loaders</Path>
+      <Path>nacara.fsx</Path>
       <Path>package-lock.json</Path>
       <Path>package.json</Path>
       <Path>paket.dependencies</Path>

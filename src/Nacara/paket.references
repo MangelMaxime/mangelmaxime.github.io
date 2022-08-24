@@ -6,3 +6,4 @@ group FSharp.Static
     FSharp.Compiler.Service
     FsToolkit.ErrorHandling
     FSharp.Quotations.Evaluator
+    Legivel

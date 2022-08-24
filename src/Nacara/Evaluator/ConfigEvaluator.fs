@@ -1,7 +1,7 @@
-namespace FSharp.Static.Evaluator
+namespace Nacara.Evaluator
 
 open FsToolkit.ErrorHandling
-open FSharp.Static.Core
+open Nacara.Core
 
 [<RequireQualifiedAccess>]
 module ConfigEvaluator =
@@ -10,10 +10,10 @@ module ConfigEvaluator =
         use fsi = EvaluatorHelpers.fsi context
 
         result {
-            do! EvaluatorHelpers.tryLoad fsi "config.fsx"
-            do! EvaluatorHelpers.tryOpen fsi "config.fsx"
+            do! EvaluatorHelpers.tryLoad fsi "nacara.fsx"
+            do! EvaluatorHelpers.tryOpen fsi "nacara.fsx"
 
-            let! configValue = EvaluatorHelpers.tryEvaluateCode fsi "config.fsx" "config"
+            let! configValue = EvaluatorHelpers.tryEvaluateCode fsi "nacara.fsx" "config"
 
             if configValue.ReflectionType <> Typeof.config then
                 return! Error """Invalid config type detected. Please make sure that your 'config.fsx' file contains a 'config' variable of type 'FSharp.Static.Core.Config'

@@ -1,4 +1,4 @@
-namespace FSharp.Static.Evaluator
+namespace Nacara.Evaluator
 
 open FSharp.Compiler.Diagnostics
 open FSharp.Compiler.Interactive.Shell
@@ -8,16 +8,18 @@ open System.Text
 open System
 open System.IO
 open FsToolkit.ErrorHandling
-open FSharp.Static.Core
+open Nacara.Core
 open System.Reflection
-open FSharp.Static
+open Nacara
 
 [<RequireQualifiedAccess>]
 module Typeof =
 
     let context = typeof<Context>
+    let pageContext = typeof<PageContext>
     let unit = typeof<Unit>
     let config = typeof<Config>
+    let string = typeof<String>
 
 [<RequireQualifiedAccess>]
 module EvaluatorHelpers =

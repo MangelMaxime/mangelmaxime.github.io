@@ -6,17 +6,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="List.Extensions.fs" />
+    <Compile Include="Array.Extensions.fs" />
     <Compile Include="Log.fs" />
     <Compile Include="Watcher.fs" />
-    <Compile Include="EvaluatorHelpers.fs" />
-    <Compile Include="ConfigEvaluator.fs" />
-    <Compile Include="LoaderEvaluator.fs" />
-    <Compile Include="RendererEvaluator.fs" />
+    <Compile Include="Evaluator/EvaluatorHelpers.fs" />
+    <Compile Include="Evaluator/ConfigEvaluator.fs" />
+    <Compile Include="Evaluator/LoaderEvaluator.fs" />
+    <Compile Include="Evaluator/RendererEvaluator.fs" />
+    <Compile Include="Commands/Version.fs" />
+    <Compile Include="Commands\Shared.fs" />
+    <Compile Include="Commands\Build.fs" />
+    <Compile Include="Commands\Clean.fs" />
     <Compile Include="Server.fs" />
+    <Compile Include="Arguments.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FSharp.Static.Core\FSharp.Static.Core.fsproj" />
+    <ProjectReference Include="..\Nacara.Core\Nacara.Core.fsproj" />
   </ItemGroup>
   <PropertyGroup>
     <!-- dotnet watch change the CWD -->

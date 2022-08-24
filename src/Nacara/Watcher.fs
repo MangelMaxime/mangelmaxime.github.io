@@ -1,4 +1,4 @@
-namespace FSharp.Static
+namespace Nacara
 
 // Code ported/adapted from:
 // https://github.com/fsprojects/FAKE/blob/5267477da251ed621165d31178ab9fba69de6e2f/src/app/Fake.IO.FileSystem/ChangeWatcher.fs#L122-122
@@ -130,7 +130,7 @@ module Watcher =
                 // Stop receiving events
                 watcher.EnableRaisingEvents <- false
 
-                // Free ressources
+                // Free resources
                 watcher.Dispose()
 
                 if timer.IsValueCreated then

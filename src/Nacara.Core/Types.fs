@@ -1,6 +1,8 @@
-namespace FSharp.Static.Core
+namespace Nacara.Core
 
 open System.ComponentModel.Design
+open Legivel.Attributes
+open System.IO
 
 type DirectoryConfig =
     {
@@ -102,7 +104,9 @@ type PageContext =
 
 type PageFrontMatter =
     {
+        [<YamlField("title")>]
         Title : string option
+        [<YamlField("layout")>]
         Layout : string
     }
 
@@ -152,3 +156,24 @@ type Context(projectRoot : ProjectRoot.T, isWatch : bool, logError: string -> un
     member _.ProjectRoot = projectRoot
 
     member _.IsWatch = isWatch
+
+    member this.OutputPath =
+        Path.Combine(
+            ProjectRoot.toString projectRoot,
+            this.Config.Directory.Output
+        )
+        |> AbsolutePath.create
+
+    member this.SourcePath =
+        Path.Combine(
+            ProjectRoot.toString projectRoot,
+            this.Config.Directory.Source
+        )
+        |> AbsolutePath.create
+
+    member this.LoadersPath =
+        Path.Combine(
+            ProjectRoot.toString projectRoot,
+            this.Config.Directory.Loaders
+        )
+        |> AbsolutePath.create

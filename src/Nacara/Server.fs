@@ -1,4 +1,4 @@
-namespace FSharp.Static
+namespace Nacara.Server
 
 open System
 open Microsoft.Extensions.Logging
@@ -9,8 +9,12 @@ open Microsoft.Extensions.Options
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.DependencyInjection.Extensions
 open Microsoft.Extensions.Logging.Configuration
+open Nacara
 
-module Server =
+// Namespace cannot contains extensions members
+// So we need to create an intermediate module
+[<AutoOpen>]
+module Extensions =
 
     type FSharpStaticConsoleLoggerConfiguration() =
 

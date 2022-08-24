@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7EF3BA1C-F017-48BF-A493-D0738548F3E2}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Nacara", "src\Nacara\Nacara.fsproj", "{7950BF64-8175-43A0-BBDC-F5FBD2859EAF}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Nacara.Core", "src\Nacara.Core\Nacara.Core.fsproj", "{9B943AC5-FCBB-4D4D-8538-09108EFEC9FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7950BF64-8175-43A0-BBDC-F5FBD2859EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7950BF64-8175-43A0-BBDC-F5FBD2859EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7950BF64-8175-43A0-BBDC-F5FBD2859EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7950BF64-8175-43A0-BBDC-F5FBD2859EAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B943AC5-FCBB-4D4D-8538-09108EFEC9FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B943AC5-FCBB-4D4D-8538-09108EFEC9FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B943AC5-FCBB-4D4D-8538-09108EFEC9FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B943AC5-FCBB-4D4D-8538-09108EFEC9FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7950BF64-8175-43A0-BBDC-F5FBD2859EAF} = {7EF3BA1C-F017-48BF-A493-D0738548F3E2}
+		{9B943AC5-FCBB-4D4D-8538-09108EFEC9FF} = {7EF3BA1C-F017-48BF-A493-D0738548F3E2}
+	EndGlobalSection
+EndGlobal

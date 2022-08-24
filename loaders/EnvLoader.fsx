@@ -1,9 +1,9 @@
-#r "./../src/FSharp.Static/bin/Debug/net6.0/FSharp.Static.Core.dll"
+#r "../src/Nacara/bin/Debug/net6.0/Nacara.Core.dll"
 #load "../.paket/load/net6.0/Docs/docs.group.fsx"
 #load "../utils/Log.fsx"
 
 open FsConfig
-open FSharp.Static.Core
+open Nacara.Core
 
 type Env =
     | Dev

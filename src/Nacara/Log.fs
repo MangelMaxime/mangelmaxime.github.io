@@ -1,4 +1,4 @@
-namespace FSharp.Static
+namespace Nacara
 
 module Log =
 

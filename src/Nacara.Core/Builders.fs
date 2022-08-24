@@ -1,4 +1,7 @@
-namespace FSharp.Static.Core
+namespace Nacara.Core
+
+open System
+open Nacara.Core
 
 type ConfigBuilder() =
 
@@ -93,9 +96,7 @@ type RenderBuilder() =
             Script = ""
         }
 
-    member _.Run(renderConfig: RenderConfig) =
-        printfn "Direcotry runned"
-        renderConfig
+    member _.Run(renderConfig: RenderConfig) = renderConfig
 
     [<CustomOperation("layout")>]
     member _.Layout(renderConfig: RenderConfig, newValue: string) =
@@ -115,40 +116,96 @@ type RenderBuilder() =
             Script = newValue
         }
 
-// type TemplateBuilder() =
+type TemplateConfigBuilder() =
 
-//     member _.Yield(renderConfig) =
-//         [
-//             fun (args: Config) ->
-//                 { args with
-//                     Render = renderConfig :: args.Render
-//                 }
-//         ]
+    member _.Yield(_: unit) = []
 
-//     member _.Run(args) =
-//         let initialConfig =
-//             {
-//                 Extension = "md"
-//                 FrontMatter =
-//                     {
-//                         StartDelimiter = "---"
-//                         EndDelimiter = "---"
-//                     }
-//             }
+    member _.Yield(frontMatter) =
+        [
+            fun (args: TemplateConfig) ->
+                { args with
+                    FrontMatter = frontMatter
+                }
+        ]
 
-//         List.fold (fun args f -> f args) initialConfig args
+    member _.Run(args) =
+        let initialConfig =
+            {
+                Extension = ""
+                FrontMatter =
+                    {
+                        StartDelimiter = ""
+                        EndDelimiter = ""
+                    }
+            }
 
-//     member _.Combine(args) =
-//         let (a, b) = args
+        let result =
+            List.fold (fun args f -> f args) initialConfig args
 
-//         List.concat
-//             [
-//                 a
-//                 b
-//             ]
+        // Validate that the configuration is valid
+        if String.IsNullOrEmpty result.Extension then
+            eprintfn "Missing template extension"
 
-//     member this.For(args, delayedArgs) = this.Combine(args, delayedArgs ())
+        else if String.IsNullOrEmpty result.FrontMatter.StartDelimiter then
+            eprintfn "Missing front matter start delimiter"
 
+        else if String.IsNullOrEmpty result.FrontMatter.EndDelimiter then
+            eprintfn "Missing front matter end delimiter"
+
+        result
+
+    member _.Combine(args) =
+        let (a, b) = args
+
+        List.concat
+            [
+                a
+                b
+            ]
+
+    member this.For(args, delayedArgs) = this.Combine(args, delayedArgs ())
+
+    member _.Delay f = f ()
+
+    member _.Zero _ = ()
+
+    [<CustomOperation("extension")>]
+    member _.Extension(args, extension: string) =
+        List.Cons(
+            (fun (templateConfig: TemplateConfig) ->
+                { templateConfig with
+                    Extension = extension
+                }
+            ),
+            args
+        )
+
+type FrontMatterConfigBuilder() =
+
+    member _.Yield(_: unit) =
+        {
+            StartDelimiter = "---"
+            EndDelimiter = "---"
+        }
+
+    [<CustomOperation("delimiter")>]
+    member _.Source(config, newValue: string) =
+        { config with
+            StartDelimiter = newValue
+            EndDelimiter = newValue
+        }
+
+    [<CustomOperation("start_delimiter")>]
+    member _.StartDelimiter(config, newValue: string) =
+        { config with
+            StartDelimiter = newValue
+        }
+
+    [<CustomOperation("end_delimiter")>]
+    member _.EndDelimiter(config, newValue: string) =
+        { config with
+            EndDelimiter = newValue
+        }
 
 [<AutoOpen>]
 module Builders =
@@ -156,3 +213,7 @@ module Builders =
     let config = ConfigBuilder()
     let directory = DirectoryBuilder()
     let render = RenderBuilder()
+    let template = TemplateConfigBuilder()
+
+    let front_matter =
+        FrontMatterConfigBuilder()
