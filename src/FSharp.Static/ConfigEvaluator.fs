@@ -1,15 +1,7 @@
 namespace FSharp.Static.Evaluator
 
-open FSharp.Compiler.Diagnostics
-open FSharp.Compiler.Interactive.Shell
-open FSharp.Quotations.Evaluator
-open FSharp.Reflection
-open System.Text
-open System
-open System.IO
 open FsToolkit.ErrorHandling
 open FSharp.Static.Core
-open System.Reflection
 
 [<RequireQualifiedAccess>]
 module ConfigEvaluator =
@@ -44,6 +36,5 @@ let config =
                 """
 
             else
-                return! Ok configValue
-
+                return! Ok (configValue.ReflectionValue :?> Config)
         }

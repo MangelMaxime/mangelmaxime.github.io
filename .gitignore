@@ -7,3 +7,6 @@ node_modules/
 style/pollen.scss
 bin/
 obj/
+
+.idea/*
+.idea/.idea.mangelmaxime.github.io/.idea/indexLayout.xml

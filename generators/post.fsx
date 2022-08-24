@@ -4,8 +4,9 @@
 // open Giraffe.ViewEngine
 open type Feliz.ViewEngine.Html
 open Helpers
+open FSharp.Static.Core
 
-let generate (ctx: SiteContents) (_projectRoot: string) (page: string) =
+let generate (ctx: Context) (page: string) =
     let postOpt =
         ctx.TryGetValues<PostLoader.Post>()
         |> Option.defaultValue Seq.empty

@@ -33,6 +33,4 @@ let loader (context: Context) : unit =
 
     //     System.Environment.Exit(1)
 
-    printfn "ProjectRoot: %A" context.ProjectRoot
-
     ()

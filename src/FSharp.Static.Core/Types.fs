@@ -2,64 +2,45 @@ namespace FSharp.Static.Core
 
 open System.ComponentModel.Design
 
-
-// type GeneratorConfig =
-//     {
-//         Script: string
-//         Trigger: GeneratorTrigger
-//         OutputFile: GeneratorOutput
-//     }
-
 type DirectoryConfig =
     {
-        Input: string
+        Source: string
         Output: string
-        Generators: string
         Loaders: string
+    }
+
+type CopyConfig =
+    | File of string
+    | Directory of string
+
+type RenderOutputAction =
+    | ChangeExtension of string
+
+type RenderConfig =
+    {
+        Layout: string
+        OutputAction: RenderOutputAction
+        Script: string
+    }
+
+type FrontMatterConfig =
+    {
+        StartDelimiter: string
+        EndDelimiter: string
+    }
+
+type TemplateConfig =
+    {
+        Extension : string
+        FrontMatter: FrontMatterConfig
     }
 
 type Config =
     {
         Directory: DirectoryConfig
+        Render: RenderConfig list
+        Templates : TemplateConfig list
     }
-
-
-type Hooks = | PostGeneration
-
-type GeneratorOutput =
-    /// <summary>
-    /// Generates a file with the same name.
-    /// </summary>
-    | SameFileName
-    /// <summary>
-    /// Generates a file with the provided name
-    /// <param name="newFileName">The new file name</param>
-    /// </summary>
-    | NewFileName of newFileName: string
-    /// <summary>
-    /// Generate a file with the same base name but with the extension changed
-    /// <param name="newExtension">The new extension</param>
-    /// </summary>
-    | ChangeExtension of newExtension: string
-
-type GeneratorTrigger =
-    | OnFile of fileName: string
-    | OnFileExtensions of extensions: string
-    | OnLayout of layout: string
-
-// module Config =
-
-//     let create =
-//         {
-//             Input = "docsrc"
-//             Output = "public"
-//         }
-
-//     let intput (value : string) (config : Config) =
-//         { config with Input = value }
-
-//     let output (value : string) (config : Config) =
-//         { config with Output = value }
 
 module AbsolutePath =
 
@@ -93,11 +74,36 @@ module ProjectRoot =
 
     let toString (ProjectRoot projectRoot: T) = projectRoot
 
+module PageId =
+
+    type T = private PageId of string
+
+    let create (value: string) = PageId value
+
+    let toString (PageId pageId: T) = pageId
 
 type Error =
     {
         Path: string
         Message: string
+    }
+
+type PageContext =
+    {
+        RelativePath : RelativePath.T
+        AbsolutePath : AbsolutePath.T
+        PageId : PageId.T
+        Layout : string
+        RawText : string
+        FrontMatter : string
+        Content : string
+        Title : string option
+    }
+
+type PageFrontMatter =
+    {
+        Title : string option
+        Layout : string
     }
 
 type Context(projectRoot : ProjectRoot.T, isWatch : bool, logError: string -> unit) =
