@@ -3,18 +3,8 @@ module Nacara.Main
 open Argu
 open System
 open System.IO
-open Saturn
-open Microsoft.Extensions.Logging
-open Nacara.Server
 open Nacara.Core
 open Nacara.Evaluator
-open System.Reflection
-
-module Yaml = Legivel.Serialization
-
-let private handleWebsocketReload () = ""
-
-let private signalUpdate = Event<string>()
 
 /// Minor optimization for Argu
 /// See: https://fsprojects.github.io/Argu/perf.html
@@ -24,32 +14,6 @@ let inline private checkStructure<'T> =
 #else
     false
 #endif
-
-let createServer (servedFolder: string) =
-    application {
-        url "http://localhost:8080"
-        // use_router (text "Hello world from Saturn")
-        use_static servedFolder
-        no_router
-
-        logging (fun builder ->
-            builder
-                .ClearProviders()
-                .AddColorConsoleLogger(fun configuration ->
-                    // Replace warning value from appsettings.json of "Cyan"
-                    configuration.LogLevels[
-                        LogLevel.Warning
-                    ] <- ConsoleColor.DarkCyan
-                    // Replace warning value from appsettings.json of "Red"
-                    configuration.LogLevels[
-                        LogLevel.Error
-                    ] <- ConsoleColor.DarkRed
-                )
-            |> ignore
-
-            builder.SetMinimumLevel LogLevel.Warning |> ignore
-        )
-    }
 
 let private loadLoaders (context: Context) =
 
@@ -98,19 +62,11 @@ let main argv =
     else
 
         match List.tryHead results with
-        | Some Version ->
-            Commands.Version.execute ()
-
-        | Some Build ->
-            Commands.Build.execute ()
-
-        | Some Watch -> 0
-
+        | Some Version -> Commands.Version.execute ()
+        | Some Build -> Commands.Build.execute ()
+        | Some Watch -> Commands.Watch.execute ()
         | Some Serve -> 0
-
-        | Some Clean ->
-            Commands.Clean.execute ()
-
+        | Some Clean -> Commands.Clean.execute ()
         | None ->
             printfn $"%s{parser.PrintUsage()}"
             1
@@ -155,13 +111,3 @@ let main argv =
 //                         $"File status not supported yet: %A{fileChange.Status}"
 //             )
 //         )
-
-// Keep the program alive until the user presses Ctrl+C
-// Console.CancelKeyPress.AddHandler(fun _ ea ->
-//     ea.Cancel <- true
-//     Log.info "Received Ctrl+C, shutting down..."
-//     Environment.Exit(0)
-// )
-//
-// while true do
-//     Console.ReadKey(true) |> ignore

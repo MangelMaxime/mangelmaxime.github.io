@@ -15,8 +15,9 @@
     <Compile Include="Evaluator/RendererEvaluator.fs" />
     <Compile Include="Commands/Version.fs" />
     <Compile Include="Commands\Shared.fs" />
-    <Compile Include="Commands\Build.fs" />
     <Compile Include="Commands\Clean.fs" />
+    <Compile Include="Commands\Build.fs" />
+    <Compile Include="Commands\Watch.fs" />
     <Compile Include="Server.fs" />
     <Compile Include="Arguments.fs" />
     <Compile Include="Program.fs" />

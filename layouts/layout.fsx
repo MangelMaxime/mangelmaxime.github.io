@@ -1,7 +1,7 @@
 #r "../src/Nacara/bin/Debug/net6.0/Nacara.Core.dll"
 #load "../utils/Helpers.fsx"
 #load "../loaders/EnvLoader.fsx"
-#load "../loaders/GlobalLoader.fsx"
+#load "../loaders/GlobalLoader.fsx" 
 #load "../.paket/load/net6.0/Docs/docs.group.fsx"
 
 // open Giraffe.ViewEngine

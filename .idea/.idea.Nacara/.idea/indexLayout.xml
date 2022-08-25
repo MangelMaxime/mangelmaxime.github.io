@@ -21,6 +21,8 @@
       <Path>package.json</Path>
       <Path>paket.dependencies</Path>
       <Path>paket.lock</Path>
+      <Path>src/Nacara.Core/paket.references</Path>
+      <Path>src/Nacara/paket.references</Path>
       <Path>style</Path>
       <Path>utils</Path>
     </explicitIncludes>

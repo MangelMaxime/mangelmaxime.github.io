@@ -132,6 +132,9 @@ type Context(projectRoot : ProjectRoot.T, isWatch : bool, logError: string -> un
                     ]
             )
 
+    member _.DangerousGetContainer =
+        container
+
     member _.GetValues<'T>() : seq<'T> =
         let key = typeof<ResizeArray<'T>>
         container.GetService(key) :?> seq<'T>
