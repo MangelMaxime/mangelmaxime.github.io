@@ -18,3 +18,6 @@ module Log =
 
     let debug (msg : string) =
         AnsiConsole.MarkupLineInterpolated($"{timestamp ()} {msg}")
+
+    let success (msg : string) =
+        AnsiConsole.MarkupLineInterpolated($"[green]{timestamp ()} {msg}[/]")

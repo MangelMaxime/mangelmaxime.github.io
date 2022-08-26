@@ -3,11 +3,16 @@
 open Nacara
 open Nacara.Core
 open Nacara.Evaluator
-open System
 open System.IO
+open System.Diagnostics
 
 let execute () =
-    let context = Shared.loadConfigOrExit ()
+    let sw = Stopwatch.StartNew()
+
+    let context = Shared.createContext()
+    use fsi = EvaluatorHelpers.fsi context
+
+    Shared.loadConfigOrExit fsi context
 
     // Clean artifacts from previous builds
     if Directory.Exists(AbsolutePath.toString context.OutputPath) then
@@ -19,12 +24,10 @@ let execute () =
     |> Directory.CreateDirectory
     |> ignore
 
-    let (validPages, erroredPages) =
-        Shared.extractFiles context
+    let (validPages, erroredPages) = Shared.extractFiles context
 
     // Store the valid pages in the context
-    validPages
-    |> Seq.iter context.Add
+    validPages |> Seq.iter context.Add
 
     // Some page are errored report the errors and stop.
     if erroredPages.Length > 0 then
@@ -34,17 +37,20 @@ let execute () =
     else
 
         let mutable hasPageGenerationError = false
+
         validPages
         |> Array.iter (fun pageContext ->
-            // Generate the page, if it fails stop.
-            let pageGenerationResult =
-                Shared.renderPage context pageContext
+            let succeeded = Shared.renderPage fsi context pageContext
 
-            if not hasPageGenerationError && pageGenerationResult then
+            if not hasPageGenerationError && not succeeded then
                 hasPageGenerationError <- true
         )
 
+        sw.Stop()
+
         if hasPageGenerationError then
+            Log.error $"Built with error in %i{sw.ElapsedMilliseconds} ms"
             1
         else
+            Log.success $"Built in %i{sw.ElapsedMilliseconds} ms"
             0

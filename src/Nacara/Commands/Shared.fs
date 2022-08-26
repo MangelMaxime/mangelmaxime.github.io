@@ -6,27 +6,32 @@ open Nacara.Evaluator
 open System
 open System.IO
 open System.Diagnostics
+open FSharp.Compiler.Interactive.Shell
 
 module Yaml = Legivel.Serialization
 
-let loadConfigOrExit () =
+let createContext () =
 
     let projectRoot =
         ProjectRoot.create (Directory.GetCurrentDirectory())
 
     Log.info $"CWD: {ProjectRoot.toString projectRoot}"
 
-    let context =
-        Context(projectRoot, false, Log.error)
+    Context(projectRoot, false, Log.error)
+
+
+let loadConfigOrExit (fsi : FsiEvaluationSession) (context : Context) =
+    let sw = Stopwatch.StartNew()
 
     let configPath =
-        Path.Combine(ProjectRoot.toString projectRoot, "nacara.fsx")
+        Path.Combine(ProjectRoot.toString context.ProjectRoot, "nacara.fsx")
 
     if File.Exists configPath then
 
-        match ConfigEvaluator.tryEvaluate context with
+        match ConfigEvaluator.tryEvaluate fsi with
         | Ok config ->
-            Log.info "Config loaded"
+            sw.Stop()
+            Log.info $"Config loaded in %i{sw.ElapsedMilliseconds} ms"
 
             let config =
                 { config with
@@ -35,8 +40,6 @@ let loadConfigOrExit () =
                 }
 
             context.Add config
-
-            context
 
         // Invalid config: Report and exit
         | Error errorMessage ->
@@ -48,7 +51,6 @@ let loadConfigOrExit () =
         Log.error $"Config file not found at '{configPath}'"
         exit 1
         failwith "Not reachable"
-
 
 /// <summary>
 /// Try to apply a template config to a file and returns it's content if possible.
@@ -112,7 +114,6 @@ let private tryApplyTemplateConfig
 
     | None -> Error "File is empty"
 
-
 /// <summary>
 /// Try to apply a list of template configs to a file and returns the first that succeeds.
 /// </summary>
@@ -142,11 +143,12 @@ let rec tryProcessFileContent
 
     | [] -> Error accErrors
 
-let extractFile (context: Context) (file: string) =
-    let fullPath = AbsolutePath.create file
-
+let extractFile (context: Context) (filePath: AbsolutePath.T) =
     let relativePath =
-        Path.GetRelativePath(ProjectRoot.toString context.ProjectRoot, file)
+        Path.GetRelativePath(
+            ProjectRoot.toString context.ProjectRoot,
+            AbsolutePath.toString filePath
+        )
         |> RelativePath.create
 
     let pageId =
@@ -156,13 +158,13 @@ let extractFile (context: Context) (file: string) =
         |> PageId.create
 
     let rawText =
-        File.ReadAllText(AbsolutePath.toString fullPath)
+        File.ReadAllText(AbsolutePath.toString filePath)
 
     let lines =
         rawText.Replace("\r\n", "\n").Split("\n")
 
     let fileExtension =
-        Path.GetExtension(AbsolutePath.toString fullPath)[1..]
+        Path.GetExtension(AbsolutePath.toString filePath)[1..]
 
     let templateConfigList =
         context.Config.Templates
@@ -173,21 +175,20 @@ let extractFile (context: Context) (file: string) =
     match tryProcessFileContent templateConfigList lines [] with
     | Ok fileInfo ->
         {
-            AbsolutePath = fullPath
+            AbsolutePath = filePath
             RelativePath = relativePath
             PageId = pageId
             Layout = fileInfo.FrontMatterData.Layout
             RawText = rawText
             FrontMatter = fileInfo.FrontMatter
             Content = fileInfo.Content
-            Title = fileInfo.FrontMatterData.Title
         }
         |> Ok
 
     | Error errors ->
         [
-            "Error while processing file "
-            + file
+            "Error while processing file: "
+            + (AbsolutePath.toString filePath)
             + ":"
             + "\n"
             + String.concat "\n" errors
@@ -197,13 +198,22 @@ let extractFile (context: Context) (file: string) =
 
 let extractFiles (context: Context) =
     let sourceFiles =
-        Directory.GetFiles(
-            AbsolutePath.toString context.SourcePath,
-            "*.*",
-            SearchOption.AllDirectories
-        )
+        try
+            Directory.GetFiles(
+                AbsolutePath.toString context.SourcePath,
+                "*.*",
+                SearchOption.AllDirectories
+            )
+        with
+        | :? DirectoryNotFoundException ->
+            Log.error
+                $"Source directory not found: %s{AbsolutePath.toString context.SourcePath}"
+
+            [||]
+        | ex -> raise ex
 
     sourceFiles
+    |> Array.map AbsolutePath.create
     |> Array.map (fun file -> extractFile context file)
     |> Array.partitionMap (fun page ->
         match page with
@@ -211,9 +221,8 @@ let extractFiles (context: Context) =
         | Error errorMessage -> Choice2Of2 errorMessage
     )
 
-let renderPage (context : Context) (pageContext :PageContext) =
-    let sw = Stopwatch()
-    sw.Start()
+let renderPage (fsi  :FsiEvaluationSession) (context: Context) (pageContext: PageContext) =
+    let sw = Stopwatch.StartNew()
 
     let rendererConfigOpt =
         context.Config.Render
@@ -231,20 +240,21 @@ let renderPage (context : Context) (pageContext :PageContext) =
             |> AbsolutePath.create
 
         let pageResult =
-            RendererEvaluator.tryEvaluate rendererScript context pageContext
+            RendererEvaluator.tryEvaluate fsi rendererScript context pageContext
 
         match pageResult with
         | Ok pageContent ->
             match rendererConfig.OutputAction with
             | ChangeExtension newExtension ->
                 let destination =
-                    Path.Combine (
+                    Path.Combine(
                         ProjectRoot.toString context.ProjectRoot,
                         context.Config.Directory.Output,
                         Path.ChangeExtension(
                             PageId.toString pageContext.PageId,
-                            newExtension)
+                            newExtension
                         )
+                    )
                     |> AbsolutePath.create
 
                 File.WriteAllText(
@@ -253,7 +263,10 @@ let renderPage (context : Context) (pageContext :PageContext) =
                 )
 
                 sw.Stop()
-                Log.info $"Generated: %s{RelativePath.toString pageContext.RelativePath} - %i{sw.ElapsedMilliseconds}ms"
+
+                Log.info
+                    $"Generated \"%s{RelativePath.toString pageContext.RelativePath}\" in %i{sw.ElapsedMilliseconds} ms"
+
                 true
 
         | Error errorMessage ->

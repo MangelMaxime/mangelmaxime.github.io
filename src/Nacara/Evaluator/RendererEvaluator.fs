@@ -3,9 +3,19 @@ namespace Nacara.Evaluator
 open FsToolkit.ErrorHandling
 open Nacara.Core
 open System.Reflection
+open System.Collections.Concurrent
+open FSharp.Compiler.Interactive.Shell
 
 [<RequireQualifiedAccess>]
 module RendererEvaluator =
+
+    type private CacheData =
+        {
+            Method : MethodInfo
+            Expression : obj
+        }
+
+    let private cache = new ConcurrentDictionary<_,_>()
 
     let private checkSignature (func: MethodInfo) =
         let parameters = func.GetParameters()
@@ -20,10 +30,7 @@ module RendererEvaluator =
                 return! Error "Render function should return 'string'"
         }
 
-    let tryEvaluate (render: AbsolutePath.T) (context: Context) (pageContext : PageContext) =
-        use fsi = EvaluatorHelpers.fsi context
-        let renderPath = AbsolutePath.toString render
-
+    let private loadRenderer fsi renderPath =
         result {
             do! EvaluatorHelpers.tryLoad fsi renderPath
             do! EvaluatorHelpers.tryOpen fsi renderPath
@@ -44,10 +51,32 @@ module RendererEvaluator =
             // Valid the signature of the render function
             do! checkSignature renderInvokeFunc
 
+            return {
+                Method = renderInvokeFunc
+                Expression = renderExpr
+            }
+        }
+
+    let tryEvaluate (fsi : FsiEvaluationSession) (render: AbsolutePath.T) (context: Context) (pageContext : PageContext) =
+        let renderPath = AbsolutePath.toString render
+
+        result {
+            let! (renderInfo : CacheData) =
+                match cache.TryGetValue render with
+                | true, renderInvokeFunc ->
+                    renderInvokeFunc
+
+                | false, _ ->
+                    cache.AddOrUpdate(
+                        render,
+                        loadRenderer fsi renderPath,
+                        fun _ renderInvokeFunc -> renderInvokeFunc
+                    )
+
             // Execute the render
             let untypedResult =
-                renderInvokeFunc.Invoke(
-                    renderExpr,
+                renderInfo.Method.Invoke(
+                    renderInfo.Expression,
                     [|
                         box context
                         box pageContext

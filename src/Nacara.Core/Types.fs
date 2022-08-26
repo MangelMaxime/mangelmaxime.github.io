@@ -90,6 +90,12 @@ type Error =
         Message: string
     }
 
+// Add the concept of virtual files?
+// Virtual files are files that are not present on the filesystem
+// and would allow user to "inject" pages from a loader.
+// Example usager: API documentation generation.
+// It would read information from an fsproj and then generate a bunch of
+// virtuals file for the different API pages.
 type PageContext =
     {
         RelativePath : RelativePath.T
@@ -99,13 +105,10 @@ type PageContext =
         RawText : string
         FrontMatter : string
         Content : string
-        Title : string option
     }
 
 type PageFrontMatter =
     {
-        [<YamlField("title")>]
-        Title : string option
         [<YamlField("layout")>]
         Layout : string
     }
@@ -132,8 +135,14 @@ type Context(projectRoot : ProjectRoot.T, isWatch : bool, logError: string -> un
                     ]
             )
 
-    member _.DangerousGetContainer =
-        container
+    member _.Replace(value: ResizeArray<'T>) =
+        let key = typeof<ResizeArray<'T>>
+
+        container.RemoveService(key)
+        container.AddService(
+            key,
+            value
+        )
 
     member _.GetValues<'T>() : seq<'T> =
         let key = typeof<ResizeArray<'T>>

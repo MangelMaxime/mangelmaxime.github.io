@@ -6,7 +6,11 @@ open Nacara.Evaluator
 open System.IO
 
 let execute () =
-    let context = Shared.loadConfigOrExit ()
+
+    let context = Shared.createContext()
+    use fsi = EvaluatorHelpers.fsi context
+
+    Shared.loadConfigOrExit fsi context
 
     Directory.Delete(AbsolutePath.toString context.OutputPath, true)
 

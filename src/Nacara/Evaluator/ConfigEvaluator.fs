@@ -2,12 +2,12 @@ namespace Nacara.Evaluator
 
 open FsToolkit.ErrorHandling
 open Nacara.Core
+open FSharp.Compiler.Interactive.Shell
 
 [<RequireQualifiedAccess>]
 module ConfigEvaluator =
 
-    let tryEvaluate (context : Context) =
-        use fsi = EvaluatorHelpers.fsi context
+    let tryEvaluate (fsi : FsiEvaluationSession) =
 
         result {
             do! EvaluatorHelpers.tryLoad fsi "nacara.fsx"
