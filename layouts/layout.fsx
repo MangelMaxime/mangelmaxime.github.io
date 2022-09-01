@@ -9,51 +9,6 @@ open Feliz.ViewEngine
 open type Feliz.ViewEngine.Html
 open Nacara.Core
 
-let livereloadCode =
-    """
-// Store the page_y in the URL
-// Restore the page_y from the URL
-// Replace the URL without the page_y query to make it transparent to the user
-
-// Support refresh of CSS without reloading the page
-var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
-var address = protocol + window.location.host + "/live-reload";
-
-const connect = () => {
-    var socket = new WebSocket(address);
-    let connected = false;
-
-    socket.onmessage = function (msg) {
-        // var data = JSON.parse(msg.data);
-        window.location.reload();
-    };
-
-    socket.onopen = function () {
-        connected = true;
-        console.log("Connected to Nacara server...")
-        console.log("Page will be updated when a file changes")
-    }
-
-    socket.onclose = function () {
-        if (connected) {
-            console.error("Disconnected from Nacara server...")
-        }
-        else {
-            console.error("Could not connect to Nacara server...")
-        }
-
-        setTimeout(() => {
-            console.clear();
-            console.log("Reconnecting to Nacara server...");
-            connect();
-        }, 1000);
-    }
-}
-
-connect();
-        """
-
-
 let private navbarLink (text : string) =
     li [
         a [
@@ -184,7 +139,7 @@ let mainPage (ctx: Context) (pageContent: ReactElement) =
                 // match env with
                 // | EnvLoader.Dev ->
                 script [
-                    rawText livereloadCode
+                    rawText LiveReload.javascriptCode
                 ]
                 // | EnvLoader.Prod -> ()
 
