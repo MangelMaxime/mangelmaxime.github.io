@@ -47,37 +47,21 @@ module RendererEvaluator =
     let private loadRenderer
         fsi
         (renderPath: AbsolutePath.T)
+        (registerDependencyForWatch: (DependencyWatchInfo -> unit) option)
         =
         result {
             do! EvaluatorHelpers.tryLoad fsi renderPath
             do! EvaluatorHelpers.tryOpen fsi renderPath
 
-            let fileName = AbsolutePath.toString renderPath
-            let source =
-                """
-#r "../src/Nacara/bin/Debug/net6.0/Nacara.Core.dll"
-#load "./layout.fsx"
-#load "../.paket/load/net6.0/Docs/docs.group.fsx"
-
-// open Giraffe.ViewEngine
-open type Feliz.ViewEngine.Html
-open Helpers
-open Nacara.Core
-
-let render (ctx: Context) (page: PageContext) =
-
-    div [ rawText (RelativePath.toString page.RelativePath) ] |> Layout.mainPage ctx
-                """
-                |> FSharp.Compiler.Text.SourceText.ofString
-
-            let opts, errors =
-                fsi.InteractiveChecker.GetProjectOptionsFromScript(fileName, source)
-                |> Async.RunSynchronously
-
-            opts.SourceFiles
-            |> Seq.iter (fun file ->
-                printfn "%A" file
-            )
+            match registerDependencyForWatch with
+            | Some registerDependencyForWatch ->
+                do!
+                    EvaluatorHelpers.tryRegisterRendererDependencyWatcher
+                        fsi
+                        renderPath
+                        registerDependencyForWatch
+            | None ->
+                ()
 
             let! renderFunc =
                 EvaluatorHelpers.tryEvaluateCode
@@ -110,6 +94,7 @@ let render (ctx: Context) (page: PageContext) =
         (rendererPath: AbsolutePath.T)
         (context: Context)
         (pageContext: PageContext)
+        (registerDependencyForWatch: (DependencyWatchInfo -> unit) option)
         =
         result {
             let! (renderInfo: CacheData) =
@@ -119,7 +104,7 @@ let render (ctx: Context) (page: PageContext) =
                 | false, _ ->
                     cache.AddOrUpdate(
                         rendererPath,
-                        loadRenderer fsi rendererPath,
+                        loadRenderer fsi rendererPath registerDependencyForWatch,
                         fun _ renderInvokeFunc -> renderInvokeFunc
                     )
 

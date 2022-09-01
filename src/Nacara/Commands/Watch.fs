@@ -138,7 +138,11 @@ let private createRendererWatcher
             )
         )
 
-let private runSetup (fsi: FsiEvaluationSession) (context: Context) =
+let private runSetup
+    (fsi: FsiEvaluationSession)
+    (context: Context)
+    (registerDependencyForWatch: DependencyWatchInfo -> unit)
+    =
 
     let sw = Stopwatch.StartNew()
     // Clean artifacts from previous builds
@@ -165,7 +169,8 @@ let private runSetup (fsi: FsiEvaluationSession) (context: Context) =
     // Render the pages
     validPages
     |> Array.iter (fun pageContext ->
-        Shared.renderPage fsi context pageContext |> ignore
+        Shared.renderPage fsi context pageContext (Some registerDependencyForWatch)
+        |> ignore
     )
 
     sw.Stop()
@@ -220,6 +225,7 @@ let private onConfigChange
     (watchers: ResizeArray<IDisposable>)
     (onSourceChange: AbsolutePath.T -> unit)
     (onRenderedChanged: AbsolutePath.T -> unit)
+    (registerDependencyForWatch: DependencyWatchInfo -> unit)
     =
     AnsiConsole.Clear()
     Log.info "Configuration changed - Restarting..."
@@ -231,7 +237,7 @@ let private onConfigChange
     // 3. Clean the different memorized states
     cleanState fsi &localServer newContext watchers
     // 4. Re-run the setup phase because the config has changed
-    runSetup fsi newContext
+    runSetup fsi newContext registerDependencyForWatch
     // 5. Start the new server, because now the new files are available
     runServer newContext localServer
     // 6. Notify the client that the site has been updated
@@ -254,6 +260,7 @@ let private onConfigChange
 let private onSourceFileChanged
     (fsi: FsiEvaluationSession)
     (context: Context)
+    (registerDependencyForWatch: DependencyWatchInfo -> unit)
     (pathOfChangedFile: AbsolutePath.T)
     =
 
@@ -287,7 +294,8 @@ let private onSourceFileChanged
 
         newPagesInMemory
         |> Seq.iter (fun pageContext ->
-            Shared.renderPage fsi context pageContext |> ignore
+            Shared.renderPage fsi context pageContext (Some registerDependencyForWatch)
+            |> ignore
         )
 
         sw.Stop()
@@ -305,12 +313,23 @@ let execute () =
     let mutable server = (createLocalServer context).Build()
 
     let watchers = ResizeArray()
+    let registeredDependencyForWatchCache = ResizeArray()
 
-    let onSourceFileChanged = onSourceFileChanged fsi context
+    let rec registerDependencyForWatch (info: DependencyWatchInfo) =
+        if not (registeredDependencyForWatchCache.Contains info) then
+            let onChange (pathOfChangedFile : AbsolutePath.T) =
+                RendererEvaluator.removeItemFromCache pathOfChangedFile
+                runSetup fsi context registerDependencyForWatch
+
+            registeredDependencyForWatchCache.Add info
+            watchers.Add(createRendererDepencyWatcher info onChange)
+
+    let onSourceFileChanged =
+        onSourceFileChanged fsi context registerDependencyForWatch
 
     let onRenderedChanged (pathOfChangedFile: AbsolutePath.T) =
         RendererEvaluator.removeItemFromCache pathOfChangedFile
-        runSetup fsi context
+        runSetup fsi context registerDependencyForWatch
 
     // Watch nacara.fsx file for changes
     use _ =
@@ -327,10 +346,11 @@ let execute () =
                     watchers
                     onSourceFileChanged
                     onRenderedChanged
+                    registerDependencyForWatch
             )
 
     // 1. Run the setup phase
-    runSetup fsi context
+    runSetup fsi context registerDependencyForWatch
     // 2. Start the server
     runServer context server
     // 3. Notify clients to reload, it can happen that the user

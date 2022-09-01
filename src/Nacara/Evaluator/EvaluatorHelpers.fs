@@ -27,7 +27,7 @@ module EvaluatorHelpers =
     let private sbOut = StringBuilder()
     let private sbErr = StringBuilder()
 
-    let fsi (context : Context) =
+    let fsi (context: Context) =
 
         let inStream = new StringReader("")
         let outStream = new StringWriter(sbOut)
@@ -37,7 +37,8 @@ module EvaluatorHelpers =
         let argv =
             [|
                 "--noframework"
-                if context.IsWatch then "--define:WATCH"
+                if context.IsWatch then
+                    "--define:WATCH"
                 "--define:FSHARP_STATIC"
                 "/temp/fsi.exe"
             |]
@@ -72,13 +73,12 @@ module EvaluatorHelpers =
 
             fsi.InteractiveChecker.ProjectChecked.Add(fun _ ->
                 printfn "ProjectChecked"
-                // printfn "Checked file: %A" file
-                // printfn "SourceFiles: %A" opts.SourceFiles
+            // printfn "Checked file: %A" file
+            // printfn "SourceFiles: %A" opts.SourceFiles
             )
 
             fsi
-        with
-        | ex ->
+        with ex ->
             [
                 "Error while running FSI"
                 ""
@@ -97,8 +97,7 @@ module EvaluatorHelpers =
         let fileName = Path.GetFileNameWithoutExtension path
         (string fileName[0]).ToUpperInvariant() + fileName[1..]
 
-    let getOpenInstruction (path: string) =
-        $"open %s{getModuleName path};;"
+    let getOpenInstruction (path: string) = $"open %s{getModuleName path};;"
 
     let getLoadInstruction (path: string) =
         let sanitazedPath = path.Replace("\\", "\\\\")
@@ -141,6 +140,7 @@ module EvaluatorHelpers =
 
         if openErrors.Length > 0 then
             let moduleName = getModuleName (AbsolutePath.toString path)
+
             let msg =
                 [
                     $"Failed to open module '{moduleName}'"
@@ -154,6 +154,57 @@ module EvaluatorHelpers =
 
             Error msg
         else
+            Ok()
+
+    let tryRegisterRendererDependencyWatcher
+        (fsi: FsiEvaluationSession)
+        (rendererPath: AbsolutePath.T)
+        (registerDependencyForWatch: DependencyWatchInfo -> unit)
+        =
+        let fileName = AbsolutePath.toString rendererPath
+
+        let sourceText =
+            fileName
+            |> File.ReadAllText
+            |> FSharp.Compiler.Text.SourceText.ofString
+
+        let opts, errors =
+            fsi.InteractiveChecker.GetProjectOptionsFromScript(
+                fileName,
+                sourceText
+            )
+            |> Async.RunSynchronously
+
+        if errors.Length > 0 then
+            let msg =
+                [
+                    $"Failed to get project options from script"
+                    ""
+                    $"Script: '%s{AbsolutePath.toString rendererPath}'"
+                    ""
+                    for error in errors do
+                        FSharpDiagnostic.toText error
+                ]
+                |> String.concat "\n"
+
+            Error msg
+        else
+            opts.SourceFiles
+            |> Array.iter (fun sourceFile ->
+                let dependencyPath = AbsolutePath.create sourceFile
+
+                // Only register the file as a dependency if it is not
+                // the renderer script itself.
+                if rendererPath <> dependencyPath then
+                    let dependencyWatchInfo =
+                        {
+                            DependencyPath = AbsolutePath.create sourceFile
+                            RendererPath = rendererPath
+                        }
+
+                    registerDependencyForWatch dependencyWatchInfo
+            )
+
             Ok()
 
     let tryEvaluateCode
@@ -200,7 +251,6 @@ module EvaluatorHelpers =
                     |> String.concat "\n"
 
                 Error msg
-
 
     let compileExpression (input: FsiValue) =
         let expr = input.ReflectionValue :?> Quotations.Expr
