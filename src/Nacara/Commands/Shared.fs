@@ -216,7 +216,6 @@ let renderPage
     (fsi: FsiEvaluationSession)
     (context: Context)
     (pageContext: PageContext)
-    (registerDepencyForWatch: DependencyWatchInfo -> unit)
     =
     let sw = Stopwatch.StartNew()
 
@@ -241,7 +240,6 @@ let renderPage
                 rendererScript
                 context
                 pageContext
-                registerDepencyForWatch
 
         match pageResult with
         | Ok pageContent ->

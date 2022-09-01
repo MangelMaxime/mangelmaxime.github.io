@@ -1,4 +1,4 @@
-namespace Nacara.Server
+namespace AspNetCore
 
 open System
 open Microsoft.Extensions.Logging
@@ -11,25 +11,29 @@ open Microsoft.Extensions.DependencyInjection.Extensions
 open Microsoft.Extensions.Logging.Configuration
 open Nacara
 
-// Namespace cannot contains extensions members
-// So we need to create an intermediate module
-[<AutoOpen>]
-module Extensions =
+module NacaraLoggerExtensions =
 
-    type FSharpStaticConsoleLoggerConfiguration() =
+    type NacaraLoggerConfiguration() =
 
-        let _logLevels = new Dictionary<LogLevel, ConsoleColor>()
+        let _logLevels = new Dictionary<LogLevel, string -> unit>()
 
-        do _logLevels.Add(LogLevel.Information, ConsoleColor.Green)
+        do
+            _logLevels.Add(LogLevel.Trace, Log.debug)
+            _logLevels.Add(LogLevel.Debug, Log.debug)
+            _logLevels.Add(LogLevel.Information, Log.info)
+            _logLevels.Add(LogLevel.Warning, Log.warn)
+            _logLevels.Add(LogLevel.Error, Log.error)
+            _logLevels.Add(LogLevel.Critical, Log.error)
+            _logLevels.Add(LogLevel.None, ignore)
 
         member _.EventId: int = 0
 
-        member _.LogLevels: Dictionary<LogLevel, ConsoleColor> = _logLevels
+        member _.LogLevels: Dictionary<LogLevel, string -> unit> = _logLevels
 
-    type FSharpStaticConsoleLogger
+    type NacaraLogger
         (
             name: string,
-            getCurrentConfig: Func<unit, FSharpStaticConsoleLoggerConfiguration>
+            getCurrentConfig: Func<unit, NacaraLoggerConfiguration>
         ) =
 
         member _.IsEnabled(logLevel: LogLevel) =
@@ -54,15 +58,7 @@ module Extensions =
 
                     if (config.EventId = 0 || config.EventId = eventId.Id) then
                         let logFunc =
-                            match logLevel with
-                            | LogLevel.Trace
-                            | LogLevel.Debug -> Log.debug
-                            | LogLevel.Information -> Log.info
-                            | LogLevel.Warning -> Log.warn
-                            | LogLevel.Error
-                            | LogLevel.Critical -> Log.error
-                            | LogLevel.None
-                            | _ -> ignore
+                            config.LogLevels[logLevel]
 
                         logFunc $"{formatter.Invoke(state, exn)}"
 
@@ -70,10 +66,10 @@ module Extensions =
                     ()
 
     [<UnsupportedOSPlatform("browser")>]
-    [<ProviderAlias("ColorConsole")>]
-    type ColorConsoleLoggerProvider
+    [<ProviderAlias("NacaraLogger")>]
+    type NacaraLoggerProvider
         (
-            config: IOptionsMonitor<FSharpStaticConsoleLoggerConfiguration>
+            config: IOptionsMonitor<NacaraLoggerConfiguration>
         ) =
 
         let mutable _currentConfig = config.CurrentValue
@@ -83,7 +79,7 @@ module Extensions =
             )
 
         let _loggers =
-            new ConcurrentDictionary<string, FSharpStaticConsoleLogger>(
+            new ConcurrentDictionary<string, NacaraLogger>(
                 StringComparer.OrdinalIgnoreCase
             )
 
@@ -95,9 +91,9 @@ module Extensions =
                 _loggers.GetOrAdd(
                     categoryName,
                     fun name ->
-                        new FSharpStaticConsoleLogger(
+                        new NacaraLogger(
                             name,
-                            Func<unit, FSharpStaticConsoleLoggerConfiguration>
+                            Func<unit, NacaraLoggerConfiguration>
                                 this.GetCurrentConfig
                         )
                 )
@@ -108,25 +104,25 @@ module Extensions =
 
     type ILoggingBuilder with
 
-        member this.AddColorConsoleLogger() =
+        member this.AddNacaraLogger() =
             this.AddConfiguration()
 
             this.Services.TryAddEnumerable(
-                ServiceDescriptor.Singleton<ILoggerProvider, ColorConsoleLoggerProvider>
+                ServiceDescriptor.Singleton<ILoggerProvider, NacaraLoggerProvider>
                     ()
             )
 
 
-            LoggerProviderOptions.RegisterProviderOptions<FSharpStaticConsoleLoggerConfiguration, ColorConsoleLoggerProvider>(
+            LoggerProviderOptions.RegisterProviderOptions<NacaraLoggerConfiguration, NacaraLoggerProvider>(
                 this.Services
             )
 
             this
 
-        member this.AddColorConsoleLogger
-            (configure: Action<FSharpStaticConsoleLoggerConfiguration>)
+        member this.AddNacaraLogger
+            (configure: Action<NacaraLoggerConfiguration>)
             =
-            this.AddColorConsoleLogger() |> ignore
+            this.AddNacaraLogger() |> ignore
             this.Services.Configure(configure) |> ignore
 
             this

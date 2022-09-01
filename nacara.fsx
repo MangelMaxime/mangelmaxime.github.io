@@ -1,5 +1,4 @@
 #r "./src/Nacara/bin/Debug/net6.0/Nacara.Core.dll"
-// #load "./src/FSharp.Static.Core/Types.fs"
 
 open System.IO
 open Nacara.Core

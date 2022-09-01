@@ -22,7 +22,7 @@ module LiveReloadWebSockets =
         | RefreshCSS
         | ReloadPage
 
-    let sendMessage =
+    let private sendMessage =
         fun (socket: WebSocket) (message: Msg) ->
             task {
                 let messageText =
@@ -45,7 +45,7 @@ module LiveReloadWebSockets =
                     sockets <- removeSocket sockets socket
             }
 
-    let broadcastMessage =
+    let private broadcastMessage =
         fun message ->
             task {
                 for socket in sockets do
@@ -54,6 +54,16 @@ module LiveReloadWebSockets =
                     with _ ->
                         sockets <- removeSocket sockets socket
             }
+
+    let notifyClientsToReload () =
+        broadcastMessage ReloadPage
+        |> Async.AwaitTask
+        |> Async.StartImmediate
+
+    let notifyClientsToRefreshCSS () =
+        broadcastMessage RefreshCSS
+        |> Async.AwaitTask
+        |> Async.StartImmediate
 
     type LiveReloadWebSocketMiddleware(next: RequestDelegate) =
         member __.Invoke(ctx: HttpContext) =

@@ -47,31 +47,36 @@ module RendererEvaluator =
     let private loadRenderer
         fsi
         (renderPath: AbsolutePath.T)
-        (registerDepencyForWatch: DependencyWatchInfo -> unit)
         =
         result {
             do! EvaluatorHelpers.tryLoad fsi renderPath
             do! EvaluatorHelpers.tryOpen fsi renderPath
 
-            fsi.InteractiveChecker.ClearCache(Seq.empty)
+            let fileName = AbsolutePath.toString renderPath
+            let source =
+                """
+#r "../src/Nacara/bin/Debug/net6.0/Nacara.Core.dll"
+#load "./layout.fsx"
+#load "../.paket/load/net6.0/Docs/docs.group.fsx"
 
-            // Try to locate the dependencies of the renderer
-            // and register a watcher on them to rebuild the site on changes.
-            fsi.CurrentPartialAssemblySignature.Entities
-            |> Seq.iter (fun entity ->
-                // If this is a real file
-                if entity.DeclarationLocation.FileName <> "input.fsx" then
-                    // 1. Test if the file is a real file
-                    // 2. Register the watcher
-                    let registerWatchInfo =
-                        {
-                            DependencyPath =
-                                entity.DeclarationLocation.FileName
-                                |> AbsolutePath.create
-                            RendererPath = renderPath
-                        }
+// open Giraffe.ViewEngine
+open type Feliz.ViewEngine.Html
+open Helpers
+open Nacara.Core
 
-                    registerDepencyForWatch registerWatchInfo
+let render (ctx: Context) (page: PageContext) =
+
+    div [ rawText (RelativePath.toString page.RelativePath) ] |> Layout.mainPage ctx
+                """
+                |> FSharp.Compiler.Text.SourceText.ofString
+
+            let opts, errors =
+                fsi.InteractiveChecker.GetProjectOptionsFromScript(fileName, source)
+                |> Async.RunSynchronously
+
+            opts.SourceFiles
+            |> Seq.iter (fun file ->
+                printfn "%A" file
             )
 
             let! renderFunc =
@@ -105,7 +110,6 @@ module RendererEvaluator =
         (rendererPath: AbsolutePath.T)
         (context: Context)
         (pageContext: PageContext)
-        (registerDepencyForWatch: DependencyWatchInfo -> unit)
         =
         result {
             let! (renderInfo: CacheData) =
@@ -115,7 +119,7 @@ module RendererEvaluator =
                 | false, _ ->
                     cache.AddOrUpdate(
                         rendererPath,
-                        loadRenderer fsi rendererPath registerDepencyForWatch,
+                        loadRenderer fsi rendererPath,
                         fun _ renderInvokeFunc -> renderInvokeFunc
                     )
 

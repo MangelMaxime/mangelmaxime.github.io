@@ -13,7 +13,7 @@ open Nacara.Server
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Hosting
 open Microsoft.AspNetCore.Builder
-open Nacara.Server
+open AspNetCore.NacaraLoggerExtensions
 
 let private keepAlive () =
 
@@ -138,11 +138,7 @@ let private createRendererWatcher
             )
         )
 
-let private runSetup
-    (fsi: FsiEvaluationSession)
-    (context: Context)
-    (registerDepencyForWatch: DependencyWatchInfo -> unit)
-    =
+let private runSetup (fsi: FsiEvaluationSession) (context: Context) =
 
     let sw = Stopwatch.StartNew()
     // Clean artifacts from previous builds
@@ -169,37 +165,20 @@ let private runSetup
     // Render the pages
     validPages
     |> Array.iter (fun pageContext ->
-        Shared.renderPage fsi context pageContext registerDepencyForWatch
-        |> ignore
+        Shared.renderPage fsi context pageContext |> ignore
     )
 
     sw.Stop()
     Log.info $"Site generated in %i{sw.ElapsedMilliseconds} ms"
 
-    LiveReloadWebSockets.broadcastMessage LiveReloadWebSockets.ReloadPage
-    |> Async.AwaitTask
-    |> Async.StartImmediate
-
-let createLocalServer (context: Context) =
+let private createLocalServer (context: Context) =
     application {
         url $"http://localhost:%i{context.Config.Port}"
         no_router
         use_static (AbsolutePath.toString context.OutputPath)
 
         logging (fun builder ->
-            builder
-                .ClearProviders()
-                .AddColorConsoleLogger(fun configuration ->
-                    // Replace warning value from appsettings.json of "Cyan"
-                    configuration.LogLevels[
-                        LogLevel.Warning
-                    ] <- ConsoleColor.DarkCyan
-                    // Replace warning value from appsettings.json of "Red"
-                    configuration.LogLevels[
-                        LogLevel.Error
-                    ] <- ConsoleColor.DarkRed
-                )
-            |> ignore
+            builder.ClearProviders().AddNacaraLogger() |> ignore
 
             builder.SetMinimumLevel LogLevel.Warning |> ignore
         )
@@ -210,146 +189,6 @@ let createLocalServer (context: Context) =
                 .UseMiddleware<LiveReloadWebSockets.LiveReloadWebSocketMiddleware>()
         )
     }
-
-/// <summary>
-/// The agent loop responsible for handling Watch mode of Nacara
-///
-/// <note>
-/// This function is declared outside of the Mailbox creation in order to avoid
-/// having access to scoped variables.
-/// </note>
-/// </summary>
-/// <param name="agent">The agent used to listen or send messages</param>
-/// <param name="fsi">FSI instance used for evaluatin F# code</param>
-/// <param name="context">Current Nacara context</param>
-/// <param name="sourceWatcher">Current instance of the source watcher. Like that we can dispose it when needed</param>
-/// <typeparam name="'a"></typeparam>
-/// <returns>
-/// Returns nothing as the agent is always running unless the user presses Ctrl+C
-/// to exit the program.
-/// </returns>
-// let rec private agentLoop
-//     (agent: MailboxProcessor<NacaraMsg>)
-//     (fsi: FsiEvaluationSession)
-//     (localServer: IHost)
-//     (context: Context)
-//     (watchers: IDisposable list)
-//     =
-//     async {
-//         let! msg = agent.Receive()
-
-//         try
-//             match msg with
-//             | ConfigChanged ->
-//                 let newContext = Shared.createContext ()
-//                 Shared.loadConfigOrExit fsi context
-
-//                 agent.Post RunSetup
-//                 return! agentLoop agent fsi localServer newContext []
-
-//             | RunSetup ->
-//                 // Should we empty the agent queue?
-
-//                 // Dispose the previous watchers
-//                 watchers |> Seq.iter (fun watcher -> watcher.Dispose())
-//                 // Clear the renderer cache
-//                 // Is this really needed? For now, I will leave it here
-//                 // because it is not hurting the performance too much
-//                 RendererEvaluator.clearCache ()
-//                 // Dispose the previous server
-//                 localServer.StopAsync()
-//                 |> Async.AwaitTask
-//                 |> Async.RunSynchronously
-
-//                 let newLocalServer = (createLocalServer context).Build()
-
-//                 newLocalServer.RunAsync()
-//                 |> Async.AwaitTask
-//                 |> Async.StartImmediate
-
-//                 runSetup fsi context
-
-//                 let sourceWatcher = createSourceWatcher agent context
-
-//                 let rendererWatchers =
-//                     context.Config.Render
-//                     |> List.map (fun renderer ->
-//                         let absolutePath =
-//                             Path.Combine(
-//                                 ProjectRoot.toString context.ProjectRoot,
-//                                 renderer.Script
-//                             )
-//                             |> AbsolutePath.create
-
-//                         createRendererWatcher agent context absolutePath
-//                     )
-
-//                 return!
-//                     agentLoop
-//                         agent
-//                         fsi
-//                         newLocalServer
-//                         context
-//                         (sourceWatcher :: rendererWatchers)
-
-//             | SourceFileChanged file ->
-//                 match Shared.extractFile context file with
-//                 | Ok pageContext ->
-//                     Log.info "Generating site..."
-//                     let sw = Stopwatch.StartNew()
-
-//                     let newPagesInMemory =
-//                         match context.TryGetValues<PageContext>() with
-//                         | Some knownPages ->
-//                             knownPages
-//                             |> Seq.map (fun currentPageContext ->
-//                                 // If the page context is the same as the one we want to update
-//                                 if
-//                                     currentPageContext.AbsolutePath = pageContext.AbsolutePath
-//                                 then
-//                                     pageContext
-//                                 else
-//                                     currentPageContext
-//                             )
-//                             |> ResizeArray
-
-//                         | None ->
-//                             ResizeArray
-//                                 [
-//                                     pageContext
-//                                 ]
-
-//                     context.Replace newPagesInMemory
-
-//                     newPagesInMemory
-//                     |> Seq.iter (fun pageContext ->
-//                         Shared.renderPage fsi context pageContext |> ignore
-//                     )
-
-//                     sw.Stop()
-//                     Log.info $"Site generated in %i{sw.ElapsedMilliseconds} ms"
-
-//                     return! agentLoop agent fsi localServer context watchers
-
-//                 | Error errorMessage ->
-//                     Log.error errorMessage
-//                     return! agentLoop agent fsi localServer context watchers
-
-//             | RendererChanged file ->
-//                 Log.info "Renderer changed, rebuilding site..."
-
-//                 // TODO: Only clear the render that changed
-//                 RendererEvaluator.removeItemFromCache file
-
-//                 agent.Post RunSetup
-//                 return! agentLoop agent fsi localServer context []
-
-//         with ex ->
-//             Log.error "An unexpected error occurred"
-//             AnsiConsole.WriteException ex
-//             // Keep the loop going
-//             return! agentLoop agent fsi localServer context watchers
-//     }
 
 let private cleanState
     (fsi: FsiEvaluationSession)
@@ -370,28 +209,6 @@ let private cleanState
     // Start the new server
     localServer <- (createLocalServer context).Build()
 
-let private registerWatchers
-    (onSourceChange: AbsolutePath.T -> unit)
-    (context: Context)
-    =
-
-    let sourceWatcher = createSourceWatcher onSourceChange context
-
-    // let rendererWatchers =
-    //     context.Config.Render
-    //     |> List.map (fun renderer ->
-    //         let absolutePath =
-    //             Path.Combine(
-    //                 ProjectRoot.toString context.ProjectRoot,
-    //                 renderer.Script
-    //             )
-    //             |> AbsolutePath.create
-
-    //         createRendererWatcher agent context absolutePath
-    //     )
-
-    ()
-
 let private runServer (context: Context) (server: IHost) =
     server.RunAsync() |> Async.AwaitTask |> Async.StartImmediate
     Log.info $"Server started at: http://localhost:%i{context.Config.Port}"
@@ -402,7 +219,6 @@ let private onConfigChange
     (localServer: byref<IHost>)
     (watchers: ResizeArray<IDisposable>)
     (onSourceChange: AbsolutePath.T -> unit)
-    (registerDepencyForWatch: DependencyWatchInfo -> unit)
     (onRenderedChanged: AbsolutePath.T -> unit)
     =
     AnsiConsole.Clear()
@@ -415,14 +231,13 @@ let private onConfigChange
     // 3. Clean the different memorized states
     cleanState fsi &localServer newContext watchers
     // 4. Re-run the setup phase because the config has changed
-    runSetup fsi newContext registerDepencyForWatch
+    runSetup fsi newContext
     // 5. Start the new server, because now the new files are available
     runServer newContext localServer
-    // 6. Register the watchers
+    // 6. Notify the client that the site has been updated
+    LiveReloadWebSockets.notifyClientsToReload ()
+    // 7. Register the watchers
     watchers.Add(createSourceWatcher onSourceChange newContext)
-    // by-ref values cannot be passed to a lambda,
-    // so we create a new variable to store it and be able to pass it to the lambda
-    // let accessibleContext = context
 
     newContext.Config.Render
     |> List.iter (fun renderer ->
@@ -439,7 +254,6 @@ let private onConfigChange
 let private onSourceFileChanged
     (fsi: FsiEvaluationSession)
     (context: Context)
-    (registerDepencyForWatch: DependencyWatchInfo -> unit)
     (pathOfChangedFile: AbsolutePath.T)
     =
 
@@ -473,16 +287,13 @@ let private onSourceFileChanged
 
         newPagesInMemory
         |> Seq.iter (fun pageContext ->
-            Shared.renderPage fsi context pageContext registerDepencyForWatch
-            |> ignore
+            Shared.renderPage fsi context pageContext |> ignore
         )
 
         sw.Stop()
         Log.info $"Site generated in %i{sw.ElapsedMilliseconds} ms"
 
-        LiveReloadWebSockets.broadcastMessage LiveReloadWebSockets.ReloadPage
-        |> Async.AwaitTask
-        |> Async.Start
+        LiveReloadWebSockets.notifyClientsToReload ()
 
     | Error errorMessage -> Log.error errorMessage
 
@@ -495,23 +306,11 @@ let execute () =
 
     let watchers = ResizeArray()
 
-    let registeredDepencyInfo = ResizeArray()
-
-    let rec registerDepencyForWatch (info: DependencyWatchInfo) =
-        if not (registeredDepencyInfo.Contains info) then
-            let onChange (pathOfChangedFile: AbsolutePath.T) =
-                RendererEvaluator.removeItemFromCache pathOfChangedFile
-                runSetup fsi context registerDepencyForWatch
-
-            registeredDepencyInfo.Add info
-            watchers.Add(createRendererDepencyWatcher info onChange)
-
-    let onSourceFileChanged =
-        onSourceFileChanged fsi context registerDepencyForWatch
+    let onSourceFileChanged = onSourceFileChanged fsi context
 
     let onRenderedChanged (pathOfChangedFile: AbsolutePath.T) =
         RendererEvaluator.removeItemFromCache pathOfChangedFile
-        runSetup fsi context registerDepencyForWatch
+        runSetup fsi context
 
     // Watch nacara.fsx file for changes
     use _ =
@@ -527,15 +326,17 @@ let execute () =
                     &server
                     watchers
                     onSourceFileChanged
-                    registerDepencyForWatch
                     onRenderedChanged
             )
 
     // 1. Run the setup phase
-    runSetup fsi context registerDepencyForWatch
+    runSetup fsi context
     // 2. Start the server
     runServer context server
-    // 3. Register the watchers
+    // 3. Notify clients to reload, it can happen that the user
+    // has a browser tab open and he killed then restarted the server manually
+    LiveReloadWebSockets.notifyClientsToReload ()
+    // 4. Register the watchers
     watchers.Add(createSourceWatcher onSourceFileChanged context)
 
     context.Config.Render

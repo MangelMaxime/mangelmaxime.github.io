@@ -5,16 +5,16 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="List.Extensions.fs" />
-    <Compile Include="Array.Extensions.fs" />
     <Compile Include="Log.fs" />
+    <Compile Include="Extensions/List.Extensions.fs" />
+    <Compile Include="Extensions/Array.Extensions.fs" />
+    <Compile Include="Extensions/AspNetCore.NacaraLoggerExtensions.fs" />
     <Compile Include="Watcher.fs" />
     <Compile Include="Evaluator/EvaluatorHelpers.fs" />
     <Compile Include="Evaluator/ConfigEvaluator.fs" />
     <Compile Include="Evaluator/LoaderEvaluator.fs" />
     <Compile Include="Evaluator/RendererEvaluator.fs" />
     <Compile Include="LiveReloadWebSockets.fs" />
-    <Compile Include="Server.fs" />
     <Compile Include="Arguments.fs" />
     <Compile Include="Commands/Version.fs" />
     <Compile Include="Commands\Shared.fs" />
