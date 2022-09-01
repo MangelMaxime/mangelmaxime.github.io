@@ -7,16 +7,15 @@ open FSharp.Compiler.Interactive.Shell
 [<RequireQualifiedAccess>]
 module ConfigEvaluator =
 
-    let tryEvaluate (fsi : FsiEvaluationSession) =
-
+    let tryEvaluate (fsi : FsiEvaluationSession) (context: Context) =
         result {
-            do! EvaluatorHelpers.tryLoad fsi "nacara.fsx"
-            do! EvaluatorHelpers.tryOpen fsi "nacara.fsx"
+            do! EvaluatorHelpers.tryLoad fsi context.ConfigPath
+            do! EvaluatorHelpers.tryOpen fsi context.ConfigPath
 
-            let! configValue = EvaluatorHelpers.tryEvaluateCode fsi "nacara.fsx" "config"
+            let! configValue = EvaluatorHelpers.tryEvaluateCode fsi context.ConfigPath "config"
 
             if configValue.ReflectionType <> Typeof.config then
-                return! Error """Invalid config type detected. Please make sure that your 'config.fsx' file contains a 'config' variable of type 'FSharp.Static.Core.Config'
+                return! Error """Invalid config type detected. Please make sure that your 'nacara.fsx' file contains a 'config' variable of type 'FSharp.Static.Core.Config'
 
 Example:
 #r "./src/FSharp.Static/bin/Debug/net6.0/FSharp.Static.Core.dll"

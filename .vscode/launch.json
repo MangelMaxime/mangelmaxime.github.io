@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build: Nacara.fsproj",
+            "program": "${workspaceFolder}/src/Nacara/bin/Debug/net6.0/Nacara.dll",
+            "args": [ "watch" ],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}",
+            "sourceLinkOptions": {
+                "*": {
+                    "enabled": true
+                }
+            },
+            "justMyCode": false
+        }
+    ]
+}

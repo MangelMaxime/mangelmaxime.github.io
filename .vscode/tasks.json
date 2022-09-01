@@ -1,0 +1,20 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+        {
+            "type": "process",
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": "build",
+            "label": "Build: Nacara.fsproj",
+            "detail": "Build the Nacara.fsproj project using dotnet build",
+            "command": "dotnet",
+            "args": [ "build" ],
+            "options": {
+                "cwd": "${workspaceFolder}/src/Nacara",
+            },
+            "isBuildCommand": true
+        }
+    ]
+}

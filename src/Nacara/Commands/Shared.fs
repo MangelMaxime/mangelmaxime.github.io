@@ -12,15 +12,13 @@ module Yaml = Legivel.Serialization
 
 let createContext () =
 
-    let projectRoot =
-        ProjectRoot.create (Directory.GetCurrentDirectory())
+    let projectRoot = ProjectRoot.create (Directory.GetCurrentDirectory())
 
     Log.info $"CWD: {ProjectRoot.toString projectRoot}"
 
     Context(projectRoot, false, Log.error)
 
-
-let loadConfigOrExit (fsi : FsiEvaluationSession) (context : Context) =
+let loadConfigOrExit (fsi: FsiEvaluationSession) (context: Context) =
     let sw = Stopwatch.StartNew()
 
     let configPath =
@@ -28,7 +26,7 @@ let loadConfigOrExit (fsi : FsiEvaluationSession) (context : Context) =
 
     if File.Exists configPath then
 
-        match ConfigEvaluator.tryEvaluate fsi with
+        match ConfigEvaluator.tryEvaluate fsi context with
         | Ok config ->
             sw.Stop()
             Log.info $"Config loaded in %i{sw.ElapsedMilliseconds} ms"
@@ -74,8 +72,7 @@ let private tryApplyTemplateConfig
                 lines
                 |> Array.skip 1 // Skip the delimiter line
                 |> Array.takeWhile (fun currentLine ->
-                    currentLine
-                    <> templateConfig.FrontMatter.EndDelimiter
+                    currentLine <> templateConfig.FrontMatter.EndDelimiter
                 )
 
             let content =
@@ -85,12 +82,10 @@ let private tryApplyTemplateConfig
                 |> Array.skip (frontMattersLines.Length + 2)
                 |> String.concat "\n"
 
-            let frontMatter =
-                frontMattersLines |> String.concat "\n"
+            let frontMatter = frontMattersLines |> String.concat "\n"
 
             let frontMatterResult =
-                Yaml.Deserialize<PageFrontMatter> frontMatter
-                |> List.head
+                Yaml.Deserialize<PageFrontMatter> frontMatter |> List.head
 
             match frontMatterResult with
             | Yaml.Error errorInfo ->
@@ -134,8 +129,7 @@ let rec tryProcessFileContent
 
     match templateConfigList with
     | templateConfig :: rest ->
-        let result =
-            tryApplyTemplateConfig templateConfig lines
+        let result = tryApplyTemplateConfig templateConfig lines
 
         match result with
         | Ok result -> Ok result
@@ -157,14 +151,11 @@ let extractFile (context: Context) (filePath: AbsolutePath.T) =
         |> Path.GetFileNameWithoutExtension
         |> PageId.create
 
-    let rawText =
-        File.ReadAllText(AbsolutePath.toString filePath)
+    let rawText = File.ReadAllText(AbsolutePath.toString filePath)
 
-    let lines =
-        rawText.Replace("\r\n", "\n").Split("\n")
+    let lines = rawText.Replace("\r\n", "\n").Split("\n")
 
-    let fileExtension =
-        Path.GetExtension(AbsolutePath.toString filePath)[1..]
+    let fileExtension = Path.GetExtension(AbsolutePath.toString filePath)[1..]
 
     let templateConfigList =
         context.Config.Templates
@@ -221,7 +212,12 @@ let extractFiles (context: Context) =
         | Error errorMessage -> Choice2Of2 errorMessage
     )
 
-let renderPage (fsi  :FsiEvaluationSession) (context: Context) (pageContext: PageContext) =
+let renderPage
+    (fsi: FsiEvaluationSession)
+    (context: Context)
+    (pageContext: PageContext)
+    (registerDepencyForWatch: DependencyWatchInfo -> unit)
+    =
     let sw = Stopwatch.StartNew()
 
     let rendererConfigOpt =
@@ -240,7 +236,12 @@ let renderPage (fsi  :FsiEvaluationSession) (context: Context) (pageContext: Pag
             |> AbsolutePath.create
 
         let pageResult =
-            RendererEvaluator.tryEvaluate fsi rendererScript context pageContext
+            RendererEvaluator.tryEvaluate
+                fsi
+                rendererScript
+                context
+                pageContext
+                registerDepencyForWatch
 
         match pageResult with
         | Ok pageContent ->

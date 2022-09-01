@@ -6,6 +6,8 @@ open Nacara.Core
 
 let config =
     config {
+        port 8080
+
         directory {
             source "docs"
             output "public"

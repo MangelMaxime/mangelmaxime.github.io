@@ -5,6 +5,8 @@ open Nacara.Core
 
 type ConfigBuilder() =
 
+    member _.Yield(_: unit) = []
+
     member _.Yield(directory) =
         [
             fun (args: Config) ->
@@ -32,6 +34,7 @@ type ConfigBuilder() =
     member _.Run(args) =
         let initialConfig =
             {
+                Port = 8080
                 Directory =
                     {
                         Source = "docsrc"
@@ -58,6 +61,17 @@ type ConfigBuilder() =
     member _.Delay f = f ()
 
     member _.Zero _ = ()
+
+    [<CustomOperation("port")>]
+    member _.Port(args, port : int) =
+        List.Cons(
+            (fun (config : Config) ->
+                { config with
+                    Port = port
+                }
+            ),
+            args
+        )
 
 
 type DirectoryBuilder() =

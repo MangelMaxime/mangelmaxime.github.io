@@ -19,9 +19,8 @@ module LoaderEvaluator =
                 return! Error $"Loader function should return '{Typeof.unit.Name}'"
         }
 
-    let tryEvaluate (loader: AbsolutePath.T) (context: Context) =
+    let tryEvaluate (loaderPath: AbsolutePath.T) (context: Context) =
         use fsi = EvaluatorHelpers.fsi context
-        let loaderPath = AbsolutePath.toString loader
 
         result {
             do! EvaluatorHelpers.tryLoad fsi loaderPath
@@ -56,7 +55,7 @@ module LoaderEvaluator =
         }
         |> Result.mapError (fun error ->
             [
-                $"Invalid loader: {loaderPath}"
+                $"Invalid loader: %s{AbsolutePath.toString loaderPath}"
                 $"Error: {error}"
                 """
 Example:

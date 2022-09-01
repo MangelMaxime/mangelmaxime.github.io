@@ -43,13 +43,40 @@ module EvaluatorHelpers =
             |]
 
         try
-            FsiEvaluationSession.Create(
-                fsiConfig,
-                argv,
-                inStream,
-                outStream,
-                errStream
+            let fsi =
+                FsiEvaluationSession.Create(
+                    fsiConfig,
+                    argv,
+                    inStream,
+                    outStream,
+                    errStream
+                )
+
+            fsi.InteractiveChecker.FileParsed.Add(fun (file, opts) ->
+                printfn "FileParsed"
+                printfn "Checked file: %A" file
+                printfn "SourceFiles: %A" opts.SourceFiles
             )
+
+            fsi.InteractiveChecker.FileChecked.Add(fun (file, opts) ->
+                printfn "FileChecked"
+                printfn "Checked file: %A" file
+                printfn "SourceFiles: %A" opts.SourceFiles
+            )
+
+            fsi.InteractiveChecker.BeforeBackgroundFileCheck.Add(fun (file, opts) ->
+                printfn "BeforeBackgroundFileCheck"
+                printfn "Checked file: %A" file
+                printfn "SourceFiles: %A" opts.SourceFiles
+            )
+
+            fsi.InteractiveChecker.ProjectChecked.Add(fun _ ->
+                printfn "ProjectChecked"
+                // printfn "Checked file: %A" file
+                // printfn "SourceFiles: %A" opts.SourceFiles
+            )
+
+            fsi
         with
         | ex ->
             [
@@ -82,9 +109,12 @@ module EvaluatorHelpers =
         let toText (error: FSharpDiagnostic) =
             $"{error.Start}-{error.End} {error.Message}"
 
-    let tryLoad (fsi: FsiEvaluationSession) (path: string) =
+    let tryLoad (fsi: FsiEvaluationSession) (path: AbsolutePath.T) =
         let _, loadErrors =
-            fsi.EvalInteractionNonThrowing(getLoadInstruction path)
+            path
+            |> AbsolutePath.toString
+            |> getLoadInstruction
+            |> fsi.EvalInteractionNonThrowing
 
         if loadErrors.Length > 0 then
             let msg =
@@ -102,14 +132,18 @@ module EvaluatorHelpers =
         else
             Ok()
 
-    let tryOpen (fsi: FsiEvaluationSession) (path: string) =
+    let tryOpen (fsi: FsiEvaluationSession) (path: AbsolutePath.T) =
         let _, openErrors =
-            fsi.EvalInteractionNonThrowing(getOpenInstruction path)
+            path
+            |> AbsolutePath.toString
+            |> getOpenInstruction
+            |> fsi.EvalInteractionNonThrowing
 
         if openErrors.Length > 0 then
+            let moduleName = getModuleName (AbsolutePath.toString path)
             let msg =
                 [
-                    $"Failed to open module '{getModuleName path}'"
+                    $"Failed to open module '{moduleName}'"
                     ""
                     $"Script: '{path}'"
                     ""
@@ -124,7 +158,7 @@ module EvaluatorHelpers =
 
     let tryEvaluateCode
         (fsi: FsiEvaluationSession)
-        (path: string)
+        (path: AbsolutePath.T)
         (code: string)
         =
         let evaluationResult, evalErrors = fsi.EvalExpressionNonThrowing(code)
@@ -134,7 +168,7 @@ module EvaluatorHelpers =
                 [
                     $"Failed to evaluate code"
                     ""
-                    $"Script: '{path}'"
+                    $"Script: '%s{AbsolutePath.toString path}'"
                     ""
                     for error in evalErrors do
                         FSharpDiagnostic.toText error

@@ -40,7 +40,7 @@ let execute () =
 
         validPages
         |> Array.iter (fun pageContext ->
-            let succeeded = Shared.renderPage fsi context pageContext
+            let succeeded = Shared.renderPage fsi context pageContext ignore
 
             if not hasPageGenerationError && not succeeded then
                 hasPageGenerationError <- true

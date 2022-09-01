@@ -15,8 +15,7 @@ type CopyConfig =
     | File of string
     | Directory of string
 
-type RenderOutputAction =
-    | ChangeExtension of string
+type RenderOutputAction = ChangeExtension of string
 
 type RenderConfig =
     {
@@ -33,46 +32,57 @@ type FrontMatterConfig =
 
 type TemplateConfig =
     {
-        Extension : string
+        Extension: string
         FrontMatter: FrontMatterConfig
     }
 
 type Config =
     {
+        Port: int
         Directory: DirectoryConfig
         Render: RenderConfig list
-        Templates : TemplateConfig list
+        Templates: TemplateConfig list
     }
+
+module Path =
+
+    let normalize (path: string) = path.Replace("\\", "/")
 
 module AbsolutePath =
 
     type T = private AbsolutePath of string
 
-    let create (value: string) = AbsolutePath value
+    let create (value: string) = value |> Path.normalize |> AbsolutePath
 
     let toString (AbsolutePath absolutePath: T) = absolutePath
+
+    let getDirectoryName (AbsolutePath absolutePath: T) =
+        Path.GetDirectoryName(absolutePath)
+
+    let getFileName (AbsolutePath absolutePath: T) =
+        Path.GetFileName(absolutePath)
 
 module RelativePath =
 
     type T = private RelativePath of string
 
-    let create (value: string) = RelativePath value
+    let create (value: string) = value |> Path.normalize |> RelativePath
 
     let toString (RelativePath relativePath: T) = relativePath
 
-module FileName =
+// module FileName =
 
-    type T = private FileName of string
+//     type T = private FileName of string
 
-    let create (value: string) = FileName value
+//     let create (value: string) = FileName value
 
-    let toString (FileName fileName: T) = fileName
+//     let toString (FileName fileName: T) = fileName
 
 module ProjectRoot =
 
     type T = private ProjectRoot of string
 
-    let create (value: string) = ProjectRoot value
+    let create (value: string) = value |> Path.normalize |> ProjectRoot
 
     let toString (ProjectRoot projectRoot: T) = projectRoot
 
@@ -84,12 +94,6 @@ module PageId =
 
     let toString (PageId pageId: T) = pageId
 
-type Error =
-    {
-        Path: string
-        Message: string
-    }
-
 // Add the concept of virtual files?
 // Virtual files are files that are not present on the filesystem
 // and would allow user to "inject" pages from a loader.
@@ -98,28 +102,28 @@ type Error =
 // virtuals file for the different API pages.
 type PageContext =
     {
-        RelativePath : RelativePath.T
-        AbsolutePath : AbsolutePath.T
-        PageId : PageId.T
-        Layout : string
-        RawText : string
-        FrontMatter : string
-        Content : string
+        RelativePath: RelativePath.T
+        AbsolutePath: AbsolutePath.T
+        PageId: PageId.T
+        Layout: string
+        RawText: string
+        FrontMatter: string
+        Content: string
     }
 
 type PageFrontMatter =
     {
         [<YamlField("layout")>]
-        Layout : string
+        Layout: string
     }
 
-type Context(projectRoot : ProjectRoot.T, isWatch : bool, logError: string -> unit) =
+type Context
+    (
+        projectRoot: ProjectRoot.T,
+        isWatch: bool,
+        logError: string -> unit
+    ) =
     let container = new ServiceContainer()
-    let errors = ResizeArray<Error>()
-
-    member _.AddError(error: Error) = errors.Add(error)
-
-    member _.Errors = errors
 
     member _.Add(value: 'T) =
         let key = typeof<ResizeArray<'T>>
@@ -139,10 +143,7 @@ type Context(projectRoot : ProjectRoot.T, isWatch : bool, logError: string -> un
         let key = typeof<ResizeArray<'T>>
 
         container.RemoveService(key)
-        container.AddService(
-            key,
-            value
-        )
+        container.AddService(key, value)
 
     member _.GetValues<'T>() : seq<'T> =
         let key = typeof<ResizeArray<'T>>
@@ -161,9 +162,7 @@ type Context(projectRoot : ProjectRoot.T, isWatch : bool, logError: string -> un
 
     member _.LogError(msg: string) = logError msg
 
-    member this.Config =
-        this.TryGetValue<Config>()
-        |> Option.get
+    member this.Config = this.TryGetValue<Config>() |> Option.get
 
     member _.ProjectRoot = projectRoot
 
@@ -173,6 +172,13 @@ type Context(projectRoot : ProjectRoot.T, isWatch : bool, logError: string -> un
         Path.Combine(
             ProjectRoot.toString projectRoot,
             this.Config.Directory.Output
+        )
+        |> AbsolutePath.create
+
+    member _.ConfigPath =
+        Path.Combine(
+            ProjectRoot.toString projectRoot,
+            "nacara.fsx"
         )
         |> AbsolutePath.create
 
@@ -189,3 +195,9 @@ type Context(projectRoot : ProjectRoot.T, isWatch : bool, logError: string -> un
             this.Config.Directory.Loaders
         )
         |> AbsolutePath.create
+
+type DependencyWatchInfo =
+    {
+        DependencyPath : AbsolutePath.T
+        RendererPath : AbsolutePath.T
+    }

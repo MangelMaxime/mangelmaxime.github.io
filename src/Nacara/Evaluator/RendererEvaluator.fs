@@ -11,18 +11,32 @@ module RendererEvaluator =
 
     type private CacheData =
         {
-            Method : MethodInfo
-            Expression : obj
+            Method: MethodInfo
+            Expression: obj
         }
 
-    let private cache = new ConcurrentDictionary<_,_>()
+    let private cache = new ConcurrentDictionary<_, _>()
+
+    let clearCache () = cache.Clear()
+
+    let removeItemFromCache (key: AbsolutePath.T) =
+        cache.TryRemove(key) |> ignore
 
     let private checkSignature (func: MethodInfo) =
         let parameters = func.GetParameters()
 
         result {
-            do! EvaluatorHelpers.checkParameterType 1 parameters[0] Typeof.context
-            do! EvaluatorHelpers.checkParameterType 2 parameters[1] Typeof.pageContext
+            do!
+                EvaluatorHelpers.checkParameterType
+                    1
+                    parameters[0]
+                    Typeof.context
+
+            do!
+                EvaluatorHelpers.checkParameterType
+                    2
+                    parameters[1]
+                    Typeof.pageContext
 
             if func.ReturnType = Typeof.string then
                 return! Ok()
@@ -30,13 +44,41 @@ module RendererEvaluator =
                 return! Error "Render function should return 'string'"
         }
 
-    let private loadRenderer fsi renderPath =
+    let private loadRenderer
+        fsi
+        (renderPath: AbsolutePath.T)
+        (registerDepencyForWatch: DependencyWatchInfo -> unit)
+        =
         result {
             do! EvaluatorHelpers.tryLoad fsi renderPath
             do! EvaluatorHelpers.tryOpen fsi renderPath
 
+            fsi.InteractiveChecker.ClearCache(Seq.empty)
+
+            // Try to locate the dependencies of the renderer
+            // and register a watcher on them to rebuild the site on changes.
+            fsi.CurrentPartialAssemblySignature.Entities
+            |> Seq.iter (fun entity ->
+                // If this is a real file
+                if entity.DeclarationLocation.FileName <> "input.fsx" then
+                    // 1. Test if the file is a real file
+                    // 2. Register the watcher
+                    let registerWatchInfo =
+                        {
+                            DependencyPath =
+                                entity.DeclarationLocation.FileName
+                                |> AbsolutePath.create
+                            RendererPath = renderPath
+                        }
+
+                    registerDepencyForWatch registerWatchInfo
+            )
+
             let! renderFunc =
-                EvaluatorHelpers.tryEvaluateCode fsi renderPath "<@@ fun a b -> render a b @@>"
+                EvaluatorHelpers.tryEvaluateCode
+                    fsi
+                    renderPath
+                    "<@@ fun a b -> render a b @@>"
 
             let renderExpr = EvaluatorHelpers.compileExpression renderFunc
             let renderType = renderExpr.GetType()
@@ -51,25 +93,29 @@ module RendererEvaluator =
             // Valid the signature of the render function
             do! checkSignature renderInvokeFunc
 
-            return {
-                Method = renderInvokeFunc
-                Expression = renderExpr
-            }
+            return
+                {
+                    Method = renderInvokeFunc
+                    Expression = renderExpr
+                }
         }
 
-    let tryEvaluate (fsi : FsiEvaluationSession) (render: AbsolutePath.T) (context: Context) (pageContext : PageContext) =
-        let renderPath = AbsolutePath.toString render
-
+    let tryEvaluate
+        (fsi: FsiEvaluationSession)
+        (rendererPath: AbsolutePath.T)
+        (context: Context)
+        (pageContext: PageContext)
+        (registerDepencyForWatch: DependencyWatchInfo -> unit)
+        =
         result {
-            let! (renderInfo : CacheData) =
-                match cache.TryGetValue render with
-                | true, renderInvokeFunc ->
-                    renderInvokeFunc
+            let! (renderInfo: CacheData) =
+                match cache.TryGetValue rendererPath with
+                | true, renderInvokeFunc -> renderInvokeFunc
 
                 | false, _ ->
                     cache.AddOrUpdate(
-                        render,
-                        loadRenderer fsi renderPath,
+                        rendererPath,
+                        loadRenderer fsi rendererPath registerDepencyForWatch,
                         fun _ renderInvokeFunc -> renderInvokeFunc
                     )
 
@@ -84,15 +130,13 @@ module RendererEvaluator =
                 )
 
             match tryUnbox<string> untypedResult with
-            | Some result ->
-                return! Ok result
+            | Some result -> return! Ok result
 
-            | None ->
-                return! Error "Render function should return 'string'"
+            | None -> return! Error "Render function should return 'string'"
         }
         |> Result.mapError (fun error ->
             [
-                $"Invalid loader: {renderPath}"
+                $"Invalid renderer: {AbsolutePath.toString rendererPath}"
                 $"Error: {error}"
                 """
 Example:
