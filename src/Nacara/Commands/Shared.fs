@@ -14,9 +14,15 @@ let createContext () =
 
     let projectRoot = ProjectRoot.create (Directory.GetCurrentDirectory())
 
-    Log.info $"CWD: {ProjectRoot.toString projectRoot}"
-
-    Context(projectRoot, false, Log.error)
+    Context(
+        projectRoot,
+        false,
+        Log.info,
+        Log.error,
+        Log.warn,
+        Log.debug,
+        Log.success
+    )
 
 let loadConfigOrExit (fsi: FsiEvaluationSession) (context: Context) =
     let sw = Stopwatch.StartNew()
@@ -29,7 +35,7 @@ let loadConfigOrExit (fsi: FsiEvaluationSession) (context: Context) =
         match ConfigEvaluator.tryEvaluate fsi context with
         | Ok config ->
             sw.Stop()
-            Log.info $"Config loaded in %i{sw.ElapsedMilliseconds} ms"
+            Log.success $"Config loaded in [bold]%i{sw.ElapsedMilliseconds}[/] ms"
 
             let config =
                 { config with
@@ -265,8 +271,8 @@ let renderPage
 
                 sw.Stop()
 
-                Log.info
-                    $"Generated \"%s{RelativePath.toString pageContext.RelativePath}\" in %i{sw.ElapsedMilliseconds} ms"
+                Log.success
+                    $"Generated \"%s{RelativePath.toString pageContext.RelativePath}\" in [bold]%i{sw.ElapsedMilliseconds}[/] ms"
 
                 true
 

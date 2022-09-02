@@ -13,6 +13,11 @@ let config =
             loaders "loaders"
         }
 
+        sass {
+            input "style/index.scss"
+            output "public/style/index.css"
+        }
+
         render {
             layout "post"
             script "layouts/post.fsx"

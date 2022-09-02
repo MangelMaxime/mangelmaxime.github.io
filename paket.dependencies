@@ -23,3 +23,4 @@ group FSharp.Static
     nuget FsToolkit.ErrorHandling
     nuget FSharp.Quotations.Evaluator
     nuget Legivel
+    nuget BlackFox.CommandLine

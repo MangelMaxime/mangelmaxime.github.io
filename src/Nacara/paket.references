@@ -7,3 +7,4 @@ group FSharp.Static
     FsToolkit.ErrorHandling
     FSharp.Quotations.Evaluator
     Legivel
+    BlackFox.CommandLine

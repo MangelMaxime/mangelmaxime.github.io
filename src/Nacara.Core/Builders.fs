@@ -23,11 +23,19 @@ type ConfigBuilder() =
                 }
         ]
 
-    member _.Yield(renderConfig) =
+    member _.Yield(templateConfig) =
         [
             fun (args: Config) ->
                 { args with
-                    Templates = renderConfig :: args.Templates
+                    Templates = templateConfig :: args.Templates
+                }
+        ]
+
+    member _.Yield(sassArgs) =
+        [
+            fun (args: Config) ->
+                { args with
+                    Sass = Some sassArgs
                 }
         ]
 
@@ -43,6 +51,7 @@ type ConfigBuilder() =
                     }
                 Render = []
                 Templates = []
+                Sass = None
             }
 
         List.fold (fun args f -> f args) initialConfig args
@@ -221,6 +230,19 @@ type FrontMatterConfigBuilder() =
             EndDelimiter = newValue
         }
 
+type SassArgsBuilder() =
+
+    member _.Yield(_: unit) =
+        []
+
+    [<CustomOperation("input")>]
+    member _.Input(sassArgs, newValue: string) =
+        (SassArg.Input newValue) :: sassArgs
+
+    [<CustomOperation("output")>]
+    member _.Output(sassArgs, newValue: string) =
+        (SassArg.Output newValue) :: sassArgs
+
 [<AutoOpen>]
 module Builders =
 
@@ -231,3 +253,5 @@ module Builders =
 
     let front_matter =
         FrontMatterConfigBuilder()
+
+    let sass = SassArgsBuilder()

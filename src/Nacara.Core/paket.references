@@ -1,3 +1,4 @@
 group FSharp.Static
     FSharp.Core
     Legivel
+    BlackFox.CommandLine

@@ -9,7 +9,7 @@ open System.Diagnostics
 let execute () =
     let sw = Stopwatch.StartNew()
 
-    let context = Shared.createContext()
+    let context = Shared.createContext ()
     use fsi = EvaluatorHelpers.fsi context
 
     Shared.loadConfigOrExit fsi context
@@ -52,5 +52,25 @@ let execute () =
             Log.error $"Built with error in %i{sw.ElapsedMilliseconds} ms"
             1
         else
+
+            match context.Config.Sass with
+            | Some sassArgs ->
+                let sassResult = Sass.compile context.ProjectRoot sassArgs
+
+                if sassResult.Success then
+                    Log.success $"Sass compilation succeeded"
+                else
+                    [
+                        "Sass compilation failed:"
+                        ""
+                        sassResult.Error
+                    ]
+                    |> String.concat "\n"
+                    |> Log.error
+                    exit 1
+
+            | None ->
+                ()
+
             Log.success $"Built in %i{sw.ElapsedMilliseconds} ms"
             0

@@ -10,12 +10,14 @@
     <Compile Include="Extensions/Array.Extensions.fs" />
     <Compile Include="Extensions/AspNetCore.NacaraLoggerExtensions.fs" />
     <Compile Include="Watcher.fs" />
+    <Compile Include="FSIRefs.fs" />
     <Compile Include="Evaluator/EvaluatorHelpers.fs" />
     <Compile Include="Evaluator/ConfigEvaluator.fs" />
     <Compile Include="Evaluator/LoaderEvaluator.fs" />
     <Compile Include="Evaluator/RendererEvaluator.fs" />
     <Compile Include="LiveReloadWebSockets.fs" />
     <Compile Include="Arguments.fs" />
+    <Compile Include="Sass.fs" />
     <Compile Include="Commands/Version.fs" />
     <Compile Include="Commands\Shared.fs" />
     <Compile Include="Commands\Clean.fs" />
@@ -25,6 +27,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Nacara.Core\Nacara.Core.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="sass-runtimes\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <!-- dotnet watch change the CWD -->

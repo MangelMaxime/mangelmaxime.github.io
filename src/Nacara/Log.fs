@@ -6,16 +6,16 @@ module Log =
     open Spectre.Console
 
     let info (msg : string) =
-        AnsiConsole.MarkupLineInterpolated($"{msg}")
+        AnsiConsole.MarkupLine($"{msg}")
 
     let error (msg : string) =
-        AnsiConsole.MarkupLineInterpolated($"[red]{msg}[/]")
+        AnsiConsole.MarkupLine($"[red]{msg}[/]")
 
     let warn (msg : string) =
-        AnsiConsole.MarkupLineInterpolated($"[yellow]{msg}[/]")
+        AnsiConsole.MarkupLine($"[yellow]{msg}[/]")
 
     let debug (msg : string) =
-        AnsiConsole.MarkupLineInterpolated($"[grey93]{msg}[/]")
+        AnsiConsole.MarkupLine($"[grey93]{msg}[/]")
 
     let success (msg : string) =
-        AnsiConsole.MarkupLineInterpolated($"[green]{msg}[/]")
+        AnsiConsole.MarkupLine($"[green]{msg}[/]")

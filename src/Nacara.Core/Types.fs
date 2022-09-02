@@ -36,12 +36,44 @@ type TemplateConfig =
         FrontMatter: FrontMatterConfig
     }
 
+[<RequireQualifiedAccess>]
+type SassArg =
+    | Input of string
+    | Output of string
+    | Watch
+
+module SassArg =
+
+    let getArgRank (arg: SassArg) =
+        match arg with
+        | SassArg.Watch -> 0
+        | SassArg.Input _ -> 9998
+        | SassArg.Output _ -> 9999
+
+module SassArgs =
+
+    let sort =
+        List.sortWith (fun arg1 arg2 ->
+            compare (SassArg.getArgRank arg1) (SassArg.getArgRank arg2)
+        )
+
+    let toString (args : SassArg list) =
+        args
+        |> List.map (
+            function
+            | SassArg.Watch -> "--watch"
+            | SassArg.Input input -> input
+            | SassArg.Output output -> output
+        )
+        |> String.concat " "
+
 type Config =
     {
         Port: int
         Directory: DirectoryConfig
         Render: RenderConfig list
         Templates: TemplateConfig list
+        Sass: (SassArg list) option
     }
 
 module Path =
@@ -121,7 +153,11 @@ type Context
     (
         projectRoot: ProjectRoot.T,
         isWatch: bool,
-        logError: string -> unit
+        logInfo: string -> unit,
+        logError: string -> unit,
+        logWarn: string -> unit,
+        logDebug: string -> unit,
+        logSuccess: string -> unit
     ) =
     let container = new ServiceContainer()
 
@@ -160,7 +196,15 @@ type Context
     member this.TryGetValue<'T>() =
         this.TryGetValues<'T>() |> Option.bind (Seq.tryHead)
 
+    member _.LogInfo(msg: string) = logInfo msg
+
     member _.LogError(msg: string) = logError msg
+
+    member _.LogWarn(msg: string) = logWarn msg
+
+    member _.LogDebug(msg: string) = logDebug msg
+
+    member _.LogSuccess(msg: string) = logSuccess msg
 
     member this.Config = this.TryGetValue<Config>() |> Option.get
 
@@ -176,10 +220,7 @@ type Context
         |> AbsolutePath.create
 
     member _.ConfigPath =
-        Path.Combine(
-            ProjectRoot.toString projectRoot,
-            "nacara.fsx"
-        )
+        Path.Combine(ProjectRoot.toString projectRoot, "nacara.fsx")
         |> AbsolutePath.create
 
     member this.SourcePath =
@@ -198,6 +239,6 @@ type Context
 
 type DependencyWatchInfo =
     {
-        DependencyPath : AbsolutePath.T
-        RendererPath : AbsolutePath.T
+        DependencyPath: AbsolutePath.T
+        RendererPath: AbsolutePath.T
     }

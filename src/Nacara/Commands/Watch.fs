@@ -154,6 +154,7 @@ let private runSetup
     |> Directory.CreateDirectory
     |> ignore
 
+    Log.info ""
     Log.info "Generating site..."
 
     let (validPages, erroredPages) = Shared.extractFiles context
@@ -169,12 +170,16 @@ let private runSetup
     // Render the pages
     validPages
     |> Array.iter (fun pageContext ->
-        Shared.renderPage fsi context pageContext (Some registerDependencyForWatch)
+        Shared.renderPage
+            fsi
+            context
+            pageContext
+            (Some registerDependencyForWatch)
         |> ignore
     )
 
     sw.Stop()
-    Log.info $"Site generated in %i{sw.ElapsedMilliseconds} ms"
+    Log.success $"Site generated in [bold]%i{sw.ElapsedMilliseconds}[/] ms"
 
 let private createLocalServer (context: Context) =
     application {
@@ -196,8 +201,8 @@ let private createLocalServer (context: Context) =
     }
 
 let private cleanState
-    (fsi: FsiEvaluationSession)
     (localServer: byref<IHost>)
+    (sassCompilerOpt: byref<Process option>)
     (context: Context)
     (watchers: ResizeArray<IDisposable>)
     =
@@ -205,22 +210,38 @@ let private cleanState
     // Dispose the previous watchers
     watchers |> Seq.iter (fun watcher -> watcher.Dispose())
     watchers.Clear()
+
     // Clear the renderer cache
     // Is this really needed? For now, I will leave it here
     // because it is not hurting the performance too much
     RendererEvaluator.clearCache ()
+
+    match sassCompilerOpt with
+    | Some sassCompiler ->
+        sassCompiler.Kill()
+        sassCompilerOpt <- None
+    | None ->
+        ()
+
     // Dispose the previous server
     localServer.StopAsync() |> Async.AwaitTask |> Async.RunSynchronously
+
     // Start the new server
     localServer <- (createLocalServer context).Build()
 
 let private runServer (context: Context) (server: IHost) =
     server.RunAsync() |> Async.AwaitTask |> Async.StartImmediate
-    Log.info $"Server started at: http://localhost:%i{context.Config.Port}"
+    [
+        ""
+        $"Server started at: http://localhost:%i{context.Config.Port}"
+    ]
+    |> String.concat "\n"
+    |> Log.info
 
 let private onConfigChange
     (fsi: FsiEvaluationSession)
     (context: byref<Context>)
+    (sassCompiler: byref<Process option>)
     (localServer: byref<IHost>)
     (watchers: ResizeArray<IDisposable>)
     (onSourceChange: AbsolutePath.T -> unit)
@@ -232,17 +253,30 @@ let private onConfigChange
     // 1. Create a new context
     let newContext = Shared.createContext ()
     context <- newContext
+
     // 2. Load the new configuration
     Shared.loadConfigOrExit fsi newContext
+
     // 3. Clean the different memorized states
-    cleanState fsi &localServer newContext watchers
+    cleanState &localServer &sassCompiler newContext watchers
+
     // 4. Re-run the setup phase because the config has changed
     runSetup fsi newContext registerDependencyForWatch
+
     // 5. Start the new server, because now the new files are available
     runServer newContext localServer
-    // 6. Notify the client that the site has been updated
+
+    // 6. Start the new sass compiler
+    match newContext.Config.Sass with
+    | Some sassArgs ->
+        sassCompiler <- Some (Sass.watch context.ProjectRoot sassArgs)
+    | None ->
+        ()
+
+    // 7. Notify the client that the site has been updated
     LiveReloadWebSockets.notifyClientsToReload ()
-    // 7. Register the watchers
+
+    // 8. Register the watchers
     watchers.Add(createSourceWatcher onSourceChange newContext)
 
     newContext.Config.Render
@@ -266,6 +300,7 @@ let private onSourceFileChanged
 
     match Shared.extractFile context pathOfChangedFile with
     | Ok pageContext ->
+        Log.info ""
         Log.info "Generating site..."
         let sw = Stopwatch.StartNew()
 
@@ -294,12 +329,16 @@ let private onSourceFileChanged
 
         newPagesInMemory
         |> Seq.iter (fun pageContext ->
-            Shared.renderPage fsi context pageContext (Some registerDependencyForWatch)
+            Shared.renderPage
+                fsi
+                context
+                pageContext
+                (Some registerDependencyForWatch)
             |> ignore
         )
 
         sw.Stop()
-        Log.info $"Site generated in %i{sw.ElapsedMilliseconds} ms"
+        Log.success $"Site generated in [bold]%i{sw.ElapsedMilliseconds}[/] ms"
 
         LiveReloadWebSockets.notifyClientsToReload ()
 
@@ -311,13 +350,14 @@ let execute () =
     Shared.loadConfigOrExit fsi context
 
     let mutable server = (createLocalServer context).Build()
+    let mutable sassCompiler = None
 
     let watchers = ResizeArray()
     let registeredDependencyForWatchCache = ResizeArray()
 
     let rec registerDependencyForWatch (info: DependencyWatchInfo) =
         if not (registeredDependencyForWatchCache.Contains info) then
-            let onChange (pathOfChangedFile : AbsolutePath.T) =
+            let onChange (pathOfChangedFile: AbsolutePath.T) =
                 RendererEvaluator.removeItemFromCache pathOfChangedFile
                 runSetup fsi context registerDependencyForWatch
 
@@ -342,6 +382,7 @@ let execute () =
                 onConfigChange
                     fsi
                     &context
+                    &sassCompiler
                     &server
                     watchers
                     onSourceFileChanged

@@ -28,6 +28,13 @@ module EvaluatorHelpers =
     let private sbErr = StringBuilder()
 
     let fsi (context: Context) =
+        let refs =
+            ProjectSystem.FSIRefs.getRefs ()
+            |> List.map (fun n -> sprintf "-r:%s" n)
+
+        ProjectSystem.FSIRefs.getRefs ()
+        |> List.iter (fun n -> printfn "%A" n)
+
 
         let inStream = new StringReader("")
         let outStream = new StringWriter(sbOut)
@@ -36,10 +43,13 @@ module EvaluatorHelpers =
 
         let argv =
             [|
+                yield! refs
                 "--noframework"
+                "--noninteractive"
+                "--nologo"
                 if context.IsWatch then
                     "--define:WATCH"
-                "--define:FSHARP_STATIC"
+                "--define:NACARA"
                 "/temp/fsi.exe"
             |]
 
@@ -52,30 +62,6 @@ module EvaluatorHelpers =
                     outStream,
                     errStream
                 )
-
-            fsi.InteractiveChecker.FileParsed.Add(fun (file, opts) ->
-                printfn "FileParsed"
-                printfn "Checked file: %A" file
-                printfn "SourceFiles: %A" opts.SourceFiles
-            )
-
-            fsi.InteractiveChecker.FileChecked.Add(fun (file, opts) ->
-                printfn "FileChecked"
-                printfn "Checked file: %A" file
-                printfn "SourceFiles: %A" opts.SourceFiles
-            )
-
-            fsi.InteractiveChecker.BeforeBackgroundFileCheck.Add(fun (file, opts) ->
-                printfn "BeforeBackgroundFileCheck"
-                printfn "Checked file: %A" file
-                printfn "SourceFiles: %A" opts.SourceFiles
-            )
-
-            fsi.InteractiveChecker.ProjectChecked.Add(fun _ ->
-                printfn "ProjectChecked"
-            // printfn "Checked file: %A" file
-            // printfn "SourceFiles: %A" opts.SourceFiles
-            )
 
             fsi
         with ex ->
