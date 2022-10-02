@@ -1,0 +1,104 @@
+:root {
+    /* Fonts */
+    --font-sans: -apple-system, BlinkMacSystemFont, Avenir, "Avenir Next",
+    "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+    --font-mono: 'Consolas, Menlo, Monaco, "Liberation Mono", monospace';
+
+    /*
+        Spacing logic
+
+        Scaling follows the fibonacci sequence
+    */
+    /* Dynamic spacing */
+    --space-unit: 1em;
+    --space-1: calc(0.25 * var(--space-unit));
+    --space-2: calc(0.5 * var(--space-unit));
+    --space-3: calc(0.75 * var(--space-unit));
+    --space-4: calc(1.25 * var(--space-unit));
+    --space-5: calc(2 * var(--space-unit));
+    --space-6: calc(3.25 * var(--space-unit));
+    --space-7: calc(5.25 * var(--space-unit));
+
+    /* Fixed spacing */
+    --space-unit-rem: 1rem;
+    --space-1-fixed: calc(0.25 * var(--space-unit-rem));
+    --space-2-fixed: calc(0.5 * var(--space-unit-rem));
+    --space-3-fixed: calc(0.75 * var(--space-unit-rem));
+    --space-4-fixed: calc(1.25 * var(--space-unit-rem));
+    --space-5-fixed: calc(2 * var(--space-unit-rem));
+    --space-6-fixed: calc(3.25 * var(--space-unit-rem));
+    --space-7-fixed: calc(5.25 * var(--space-unit-rem));
+
+    --space-standard: var(--space-3);
+
+    /*
+        Default spacing for the components
+        Using a variable make it easier to use the same spacing
+        for all the components without having to remember the actual value
+    */
+    --component-padding: var(--space-3);
+
+    /* Text sizes */
+    --text-base-size: 1rem;
+    /* See https://type-scale.com/ for ideas on ratios */
+    /* Ratio used for small screen */
+    --text-scale-ratio: 1.250;
+    /* Ratio used for desktop screen */
+    --text-scale-ratio-alt: 1.333;
+
+    /* Type scale */
+    --text-size-4: calc(var(--text-base-size) * var(--text-scale-ratio));
+    --text-size-3: calc(var(--text-size-4) * var(--text-scale-ratio));
+    --text-size-2: calc(var(--text-size-3) * var(--text-scale-ratio));
+    --text-size-1: calc(var(--text-size-2) * var(--text-scale-ratio));
+
+    --text-vertical-spacing: 0.65em;
+
+    --color-text-heading: lightpink;
+
+    /*
+        Radius
+
+        Should I use rem to make the radius scale with the base font size?
+    */
+    --radius-small: 2px;
+    --radius: 4px;
+    --radius-large: 8px;
+    --radius-rounded: 9999px;
+
+
+    /*
+        Font weight
+        Only 3 variations to simplify decision making
+    */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-bold: 500;
+
+    --header-font-weight: var(--font-weight-bold);
+
+    /*
+        Colors
+    */
+    /* Grey scale */
+    --grey: hsl(0, 0%, 87.50%);
+    --grey-light: hsl(0, 0%, 65.90%);
+    --grey-dark: hsl(0, 0%, 23.10%);
+    /* Primary colors */
+    --color-primary-light: #8e8fd2;
+    --color-primary: hsl(239, 43%, 59%);
+    /* Semantic colors */
+    --color-success: hsl(138, 92%, 21%);
+    --color-error: hsl(0, 92%, 36%);
+}
+
+/*
+Brand
+Site
+Accent
+Success
+Error
+Warning
+Info
+*/

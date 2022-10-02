@@ -1,0 +1,24 @@
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+/>
+
+<title>{{ site.Title }}</title>
+
+{{/*  Include the CSS  */}}
+{{- $reset := (resources.Get "css/core/reset.css") }}
+{{- $variables := (resources.Get "css/core/variables.css") }}
+{{- $typography := (resources.Get "css/core/typography.css") }}
+
+{{- /* order is important */}}
+{{- $core := (slice $reset $variables $typography) | resources.Concat "assets/css/core.css" }}
+{{- $core := $core | resources.PostCSS }}
+
+{{/*  If building for production, delay the transformation for after Hugo build  */}}
+{{ if hugo.IsProduction }}
+{{ $core = $core | minify | fingerprint | resources.PostProcess }}
+{{ end }}
+
+<link crossorigin="anonymous" href="{{ $core.RelPermalink }}" rel="preload stylesheet" as="style">
