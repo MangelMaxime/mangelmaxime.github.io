@@ -1,15 +1,24 @@
 {
     "FSharp.suggestGitignore": false,
-    "cssvar.files": [
-        "style/_variables.scss"
-    ],
+    "cssvar.files": ["style/_variables.scss"],
     "cssvar.ignore": [],
     "cssvar.disableSort": false,
-    "cssvar.extensions": [
-        "css",
-        "scss",
-        "tsx",
-        "jsx"
-    ],
-    "editor.inlayHints.enabled": "offUnlessPressed"
+    "cssvar.extensions": ["css", "scss", "tsx", "jsx"],
+    "emmet.includeLanguages": {
+        "nunjucks": "html"
+    },
+    "[markdown]": {
+        "editor.wordWrapColumn": 100,
+        "editor.wordWrap": "bounded",
+        // Turned off to prevent Emmet when writing code fenced blocks
+        "editor.quickSuggestions": {
+            "other": "off",
+            "comments": "off",
+            "strings": "off"
+        }
+    },
+    "[nunjucks]": {
+        "editor.wordWrapColumn": 100,
+        "editor.wordWrap": "bounded"
+    }
 }

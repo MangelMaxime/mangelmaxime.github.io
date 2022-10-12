@@ -1,0 +1,9 @@
+{% extends "layouts/base.njk" %}
+
+{% block pageContent %}
+
+{% set lastModifiedDate = page.inputPath | lastModifiedDate | formatDate %}
+
+<i>Last updated on <strong>{{ lastModifiedDate }}</strong></i>
+
+{% endblock pageContent %}

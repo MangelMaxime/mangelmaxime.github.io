@@ -1,0 +1,7 @@
+.DS_Store
+.vscode/
+node_modules/
+_site/
+package-lock.json
+README.md
+_11ty/

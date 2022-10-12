@@ -1,6 +1,0 @@
-baseURL = 'http://mangelmaxime.github.io/'
-languageCode = 'en-us'
-title = 'MangelMaxime'
-
-[build]
-  writeStats = true

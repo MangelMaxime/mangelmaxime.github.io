@@ -1,9 +1,16 @@
 {
-  "dependencies": {
-    "postcss": "^8.4.17",
-    "postcss-cli": "^10.0.0"
-  },
-  "devDependencies": {
-    "@fullhuman/postcss-purgecss": "^5.0.0"
-  }
+    "scripts": {
+        "start": "cross-env ELEVENTY_ENV=dev npx @11ty/eleventy --serve",
+        "build": "cross-env ELEVENTY_ENV=prod npx @11ty/eleventy"
+    },
+    "devDependencies": {
+        "@11ty/eleventy": "^1.0.2",
+        "@fec/eleventy-plugin-remark": "^3.1.1",
+        "cross-env": "^7.0.3",
+        "gatsby-remark-vscode": "^3.3.1",
+        "postcss-cli": "^10.0.0",
+        "rehype-raw": "5.1.0",
+        "rehype-stringify": "8.0.0",
+        "remark-rehype": "8.1.0"
+    }
 }

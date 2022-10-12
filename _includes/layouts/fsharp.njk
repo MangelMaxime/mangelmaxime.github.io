@@ -1,0 +1,53 @@
+{#
+    Compute body class to identify the current page and the layout
+
+    The ideas is taken from: https://11ty.rocks/tips/layout-templating/
+
+    It makes it easy to apply page specific styles
+#}
+
+{#
+    Use page.fileSlug is available otherwise fallback to home
+
+    Note: index doesn't have a fileSlug computed so will fallback to home
+#}
+{% set pageBodyClass = page.filePathStem | file_to_body_class %}
+{% set layoutBodyClass = layout | layout_to_body_class %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% if isDevelopment %}
+        {{ '🚨' | favIconFromEmoji | safe }}
+    {% else %}
+        <link rel="icon" href="{{ '/assets/img/favicon/favicon-192x192.png' | addHash }}" type="image/png">
+    {% endif %}
+
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="/" crossorigin>
+    <title>{{ title or metadata.title | escape }}</title>
+  </head>
+  <body class="{{ pageBodyClass }} {{ layoutBodyClass }}">
+    <br/>
+    This is the F# template
+
+    <p>Shortcode/filter directly from the template: {{ pageBodyClass }}</p>
+
+    <br/>
+
+    This is from the content:
+
+    <br/><br/>
+
+    {% block pageContent %}
+        {{ content | safe }}
+    {% endblock pageContent %}
+
+
+  </body>
+</html>
