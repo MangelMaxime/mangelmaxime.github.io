@@ -1,6 +1,7 @@
 {
+    "$schema": "./../schemas/metadata-schema.json",
     "url": "https://mangelmaxime.github.io",
-    "title": "Mangel Maxime",
+    "title": "Maxime's site",
     "description": "",
     "author": {
         "name": "Maxime Mangel",

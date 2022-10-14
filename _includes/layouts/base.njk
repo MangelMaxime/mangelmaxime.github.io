@@ -15,29 +15,36 @@
 {% set layoutBodyClass = layout | layout_to_body_class %}
 
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html class="has-navbar-fixed-top" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {% if isDevelopment %}
-        {{ '🚨' | favIconFromEmoji | safe }}
-    {% else %}
-        <link rel="icon" href="{{ '/assets/img/favicon/favicon-192x192.png' | addHash }}" type="image/png">
-    {% endif %}
+        {% if isDevelopment %}
+            {{ '🚨' | favIconFromEmoji | safe }}
+        {% else %}
+            <link rel="icon" href="{{ '/assets/img/favicon/favicon-192x192.png' | addHash }}" type="image/png">
+        {% endif %}
 
-    <meta name="referrer" content="no-referrer-when-downgrade">
+        <meta name="referrer" content="no-referrer-when-downgrade">
 
-    <link rel="stylesheet" href="/style.css">
-    <link rel="preconnect" href="/" crossorigin>
-    <title>{{ title or metadata.title | escape }}</title>
-  </head>
-  <body class="{{ pageBodyClass }} {{ layoutBodyClass }}">
-    {{ pageBodyClass }}
+        <link rel="stylesheet" href="/style.css">
+        <link rel="preconnect" href="/" crossorigin="crossorigin">
+        <title>{{ title or metadata.title | escape }}</title>
+        <script src="/assets/js/navbar.js" defer></script>
+    </head>
+    <body class="{{ pageBodyClass }} {{ layoutBodyClass }}">
+        {% include "components/navbar.njk" %}
 
-    {% block pageContent %}
-        {{ content | safe }}
-    {% endblock pageContent %}
+        {% for endItem in navbar.end %}
+            <li>{{ endItem.label }}</li>
+        {% endfor %}
 
-  </body>
+        {{ pageBodyClass }}
+
+        {% block pageContent %}
+            {{ content | safe }}
+        {% endblock pageContent %}
+
+    </body>
 </html>

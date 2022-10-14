@@ -1,7 +1,7 @@
 (***
 title: This is my first post.
 description: This is a post on My Blog about agile frameworks.
-layout: layouts/fsharp.njk
+layout: layouts/base.njk
 ***)
 
 let add (a : int) (b : int) = a + b

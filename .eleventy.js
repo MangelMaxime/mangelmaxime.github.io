@@ -1,10 +1,10 @@
 const eleventyFsharpLiterate = require("./_11ty/plugins/fsharp-literate");
-const { EleventyRenderPlugin } = require("@11ty/eleventy");
 const eleventyRemark = require("@fec/eleventy-plugin-remark");
 const remarkVscode = require("gatsby-remark-vscode");
 const rehypeRaw = require("rehype-raw");
 const rehypeStringify = require("rehype-stringify");
 const remarkToRehype = require("remark-rehype");
+const eleventySass = require("eleventy-sass");
 
 const remarkOptions = {
     enableRehype: false,
@@ -50,8 +50,7 @@ module.exports = function (eleventyConfig) {
     //     eleventyConfig.addTransform("htmlmin", require("./_11ty/htmlminify.js"));
     // }
 
-    eleventyConfig.addPlugin(EleventyRenderPlugin);
-
+    eleventyConfig.addPlugin(eleventySass);
 
     eleventyConfig.addPlugin(eleventyRemark, remarkOptions);
     eleventyConfig.addPlugin(eleventyFsharpLiterate({

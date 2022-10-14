@@ -142,8 +142,6 @@ function processFile(accumulator, lines) {
 
         const newAccumulator = accumulator.concat(markdownLines);
 
-        console.log("rest", rest);
-
         const endLine = rest[0];
 
         // Check if the line ending the markdown comment has some content

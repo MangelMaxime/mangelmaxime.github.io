@@ -5,3 +5,4 @@ _site/
 package-lock.json
 README.md
 _11ty/
+scss/

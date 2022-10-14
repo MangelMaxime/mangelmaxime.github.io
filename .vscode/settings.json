@@ -5,7 +5,7 @@
     "cssvar.disableSort": false,
     "cssvar.extensions": ["css", "scss", "tsx", "jsx"],
     "emmet.includeLanguages": {
-        "nunjucks": "html"
+        "njk": "html"
     },
     "[markdown]": {
         "editor.wordWrapColumn": 100,
@@ -20,5 +20,9 @@
     "[nunjucks]": {
         "editor.wordWrapColumn": 100,
         "editor.wordWrap": "bounded"
+    },
+    "html.suggest.html5": true,
+    "files.associations": {
+        "*.njk": "njk"
     }
 }
