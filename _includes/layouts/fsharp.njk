@@ -23,7 +23,7 @@
     {% if isDevelopment %}
         {{ '🚨' | fav_icon_from_emoji | safe }}
     {% else %}
-        <link rel="icon" href="{{ '/assets/img/favicon/favicon-192x192.png' | addHash }}" type="image/png">
+        <link rel="icon" href="{{ '/assets/img/favicon/favicon-192x192.png' | add_hash }}" type="image/png">
     {% endif %}
 
     <meta name="referrer" content="no-referrer-when-downgrade">
