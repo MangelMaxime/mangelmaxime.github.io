@@ -35,6 +35,8 @@ const remarkOptions = {
 };
 
 module.exports = function (eleventyConfig) {
+    eleventyConfig.addWatchTarget("_11ty");
+
     // set copy asset folder to dist
     eleventyConfig.addPassthroughCopy("assets");
 
@@ -59,12 +61,13 @@ module.exports = function (eleventyConfig) {
     // console.log(eleventyConfig);
 
     // Filters
-    eleventyConfig.addNunjucksFilter("favIconFromEmoji", require("./_11ty/filters/favIconFromEmoji"));
-    eleventyConfig.addNunjucksAsyncFilter("lastModifiedDate", require("./_11ty/filters/lastModifiedDate"));
-    eleventyConfig.addNunjucksFilter("formatDate", require("./_11ty/filters/formatDate"));
-    eleventyConfig.addNunjucksAsyncFilter("addHash", require("./_11ty/filters/addHash"));
-    eleventyConfig.addNunjucksFilter("file_to_body_class", require("./_11ty/filters/file_to_body_class"));
-    eleventyConfig.addNunjucksFilter("layout_to_body_class", require("./_11ty/filters/layout_to_body_class"));
+    eleventyConfig.addNunjucksFilter("fav_icon_from_emoji", require("./_11ty/filters/favIconFromEmoji"));
+    eleventyConfig.addNunjucksAsyncFilter("last_modified_date", require("./_11ty/filters/lastModifiedDate"));
+    eleventyConfig.addNunjucksFilter("format_date", require("./_11ty/filters/formatDate"));
+    eleventyConfig.addNunjucksAsyncFilter("add_hash", require("./_11ty/filters/addHash"));
+    eleventyConfig.addNunjucksFilter("file_to_body_class", require("./_11ty/filters/fileToBodyClass"));
+    eleventyConfig.addNunjucksFilter("layout_to_body_class", require("./_11ty/filters/layoutToBodyClass"));
+    eleventyConfig.addNunjucksAsyncFilter("to_icon", require("./_11ty/filters/toIcon")());
     // console.log(eleventyConfig);
 
 

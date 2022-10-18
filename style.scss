@@ -91,3 +91,16 @@ $body-size: 14px;
         }
     }
 }
+
+// Allow inlined svg to be sized based on the font size
+// svg.svg-icon {
+//     display: inline-block;
+//     width: 1em;
+//     height: 1em;
+//     position: relative;
+//     vertical-align: middle;
+// }
+
+.footer a {
+    color: $white;
+}

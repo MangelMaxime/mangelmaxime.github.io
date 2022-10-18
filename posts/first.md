@@ -10,7 +10,7 @@ This is a post on My Blog about agile frameworks.
 
 Test: {{ pageBodyClass }}
 
-{{ '🚨' | favIconFromEmoji | safe }}
+{{ '🚨' | fav_icon_from_emoji | safe }}
 
 ```fs
 type Test =

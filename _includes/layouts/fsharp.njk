@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {% if isDevelopment %}
-        {{ '🚨' | favIconFromEmoji | safe }}
+        {{ '🚨' | fav_icon_from_emoji | safe }}
     {% else %}
         <link rel="icon" href="{{ '/assets/img/favicon/favicon-192x192.png' | addHash }}" type="image/png">
     {% endif %}
