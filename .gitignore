@@ -3,3 +3,5 @@ node_modules/
 
 # Ignore eleventy output
 _site/
+
+_includes/.DS_Store

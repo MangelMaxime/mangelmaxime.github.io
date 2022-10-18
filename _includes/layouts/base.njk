@@ -13,6 +13,7 @@
 #}
 {% set pageBodyClass = page.filePathStem | file_to_body_class %}
 {% set layoutBodyClass = layout | layout_to_body_class %}
+{% set hasFooterBodyClass = "has-footer" if footer.sitemapSections or footer.text or footer.copyright else "" %}
 
 <!doctype html>
 <html class="has-navbar-fixed-top" lang="en">
@@ -33,10 +34,16 @@
         <title>{{ title or metadata.title | escape }}</title>
         <script src="/assets/js/navbar.js" defer></script>
     </head>
-    <body class="{{ pageBodyClass }} {{ layoutBodyClass }}">
+    <body class="{{ pageBodyClass }} {{ layoutBodyClass }} {{ hasFooterBodyClass }}">
+
         {% include "components/navbar.njk" %}
 
-        {% for endItem in navbar.end %}
+        {{ data | dump | safe }}
+
+        <div class="page-content">
+        </div>
+
+        {# {% for endItem in navbar.end %}
             <li>{{ endItem.label }}</li>
         {% endfor %}
 
@@ -44,7 +51,7 @@
 
         {% block pageContent %}
             {{ content | safe }}
-        {% endblock pageContent %}
+        {% endblock pageContent %} #}
 
         {% include "components/footer.njk" %}
 
