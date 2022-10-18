@@ -40,6 +40,10 @@ module.exports = function (eleventyConfig) {
     // set copy asset folder to dist
     eleventyConfig.addPassthroughCopy("assets");
 
+    eleventyConfig.addGlobalData("maximeTest", {
+        prop1: "prop1"
+    })
+
     // Plugins
     // eleventyConfig.addPlugin(postCSSPlugin);
     // eleventyConfig.addPlugin(inclusiveLanguagePlugin);
