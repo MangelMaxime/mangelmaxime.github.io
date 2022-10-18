@@ -26,6 +26,13 @@ const path = require("path");
 // register window and document
 registerWindow(window, document);
 
+// TODO: Add a cache to avoid importing/computing the same icon multiple times
+// We can use the iconString as a key and implements the cache directly in the
+// main toIconFilterBuilder function.
+// This avoid the need to implement a cache for each generator
+// A cache should improve the performance especially if the footer is using a lot of them
+// because the footer is rendered on every page
+
 /**
  *
  * @param {string} text The text to camelize
