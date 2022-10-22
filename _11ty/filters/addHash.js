@@ -1,7 +1,15 @@
+// @ts-check
+
 const fs = require("fs/promises");
 const crypto = require("crypto");
 const path = require("path");
+const EleventyTypes = require("./../types/eleventy.js");
 
+/**
+ *
+ * @param {string} absolutePath
+ * @param {EleventyTypes.asyncFilterCallback} callback
+ */
 module.exports = async function (absolutePath, callback) {
     try {
         const content = await fs.readFile(path.join(".", absolutePath), {

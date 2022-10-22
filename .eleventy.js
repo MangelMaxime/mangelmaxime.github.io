@@ -35,14 +35,9 @@ const remarkOptions = {
 };
 
 module.exports = function (eleventyConfig) {
-    eleventyConfig.addWatchTarget("_11ty");
 
     // set copy asset folder to dist
     eleventyConfig.addPassthroughCopy("assets");
-
-    eleventyConfig.addGlobalData("maximeTest", {
-        prop1: "prop1"
-    })
 
     // Plugins
     // eleventyConfig.addPlugin(postCSSPlugin);
@@ -74,6 +69,8 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addNunjucksAsyncFilter("to_icon", require("./_11ty/filters/toIcon")());
     // console.log(eleventyConfig);
 
+    // Shortcodes
+    eleventyConfig.addNunjucksFilter("menu", require("./_11ty/filters/menu"));
 
     // eleventyConfig.addPlugin(eleventyRemark, remarkOptions);
     // eleventyConfig.addPlugin(eleventyFsharpLiterate, remarkOptions);

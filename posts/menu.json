@@ -1,4 +1,31 @@
 [
-    "page-1",
-    "page-2"
+    {
+        "type": "section",
+        "label": "Overview",
+        "items": [
+            "introduction",
+            "configuration"
+        ]
+    },
+    {
+        "type": "section",
+        "label": "Guides",
+        "items": [
+            {
+                "type": "section",
+                "label": "Guides22",
+                "items": [
+                    "guides/create-a-page",
+                    "guides/customize-the-style"
+                ]
+            },
+            "guides/customize-the-style"
+        ]
+    },
+    {
+        "type": "link",
+        "label": "Fable",
+        "href": "http://fable.io"
+    },
+    "guides/create-a-page"
 ]

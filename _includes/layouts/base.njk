@@ -32,36 +32,19 @@
         <link rel="stylesheet" href="/style.css">
         <link rel="preconnect" href="/" crossorigin="crossorigin">
         <title>{{ title or metadata.title | escape }}</title>
-        <script src="/assets/js/navbar.js" defer></script>
+        <script src="/assets/js/navbar.js" defer="defer"></script>
     </head>
     <body class="{{ pageBodyClass }} {{ layoutBodyClass }} {{ hasFooterBodyClass }}">
 
         {% include "components/navbar.njk" %}
 
-        {{ menu | dump | safe }}
-
-        {{ maximeTest | dump | safe }}
-
-        {{ prop2 | dump | safe }}
-
-        {{ dataComingFromDataFolder | dump | safe }}
-
-        {{ dataComingFromEleventyConfig | dump | safe }}
-
-        {{ dataComingFromEleventyConfig2 | dump | safe }}
-
         <div class="page-content">
-        </div>
 
-        {# {% for endItem in navbar.end %}
-            <li>{{ endItem.label }}</li>
-        {% endfor %}
+            {{ collections.all | menu | safe }}
 
-        {{ pageBodyClass }}
-
-        {% block pageContent %}
             {{ content | safe }}
-        {% endblock pageContent %} #}
+
+        </div>
 
         {% include "components/footer.njk" %}
 
