@@ -57,7 +57,6 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPlugin(eleventyFsharpLiterate({
         eleventyRemarkOptions: remarkOptions
     }));
-    // console.log(eleventyConfig);
 
     // Filters
     eleventyConfig.addNunjucksFilter("fav_icon_from_emoji", require("./_11ty/filters/favIconFromEmoji"));
@@ -67,10 +66,10 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addNunjucksFilter("file_to_body_class", require("./_11ty/filters/fileToBodyClass"));
     eleventyConfig.addNunjucksFilter("layout_to_body_class", require("./_11ty/filters/layoutToBodyClass"));
     eleventyConfig.addNunjucksAsyncFilter("to_icon", require("./_11ty/filters/toIcon")());
-    // console.log(eleventyConfig);
 
     // Shortcodes
-    eleventyConfig.addNunjucksFilter("menu", require("./_11ty/filters/menu"));
+    eleventyConfig.addNunjucksFilter("nacara_menu", require("./_11ty/filters/menu"));
+    eleventyConfig.addNunjucksFilter("nacara_breadcrumb", require("./_11ty/filters/breadcrumb"));
 
     // eleventyConfig.addPlugin(eleventyRemark, remarkOptions);
     // eleventyConfig.addPlugin(eleventyFsharpLiterate, remarkOptions);

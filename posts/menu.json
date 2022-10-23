@@ -27,5 +27,6 @@
         "label": "Fable",
         "href": "http://fable.io"
     },
-    "guides/create-a-page"
+    "guides/create-a-page",
+    "guides/customize-the-style"
 ]
