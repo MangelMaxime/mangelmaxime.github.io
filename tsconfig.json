@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "ESNEXT",
+        "declaration": true,
+        "module": "commonjs",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "rootDir": "./_11ty/",
+        "outDir": "./_11ty/_js/",
+        "jsx": "react",
+        "jsxFactory": "h",
+        "jsxFragmentFactory": "Fragment",
+    },
+    "exclude": [
+        "./_11ty/_js/"
+    ]
+}

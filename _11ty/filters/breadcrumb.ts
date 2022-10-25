@@ -1,46 +1,25 @@
-// @ts-check
-
-/**
- * @typedef {object} MenuSection
- * @property {'section'} type
- * @property {string} label
- * @property {MenuItem []} items
- */
-
-/**
- * @typedef {object} MenuLink
- * @property {'link'} type
- * @property {string} label
- * @property {string} href
- */
-
-/**
- * @typedef {MenuSection|MenuLink|string} MenuItem
- */
-
-/**
- * @typedef {MenuItem []} Menu
- */
-
 // @ts-ignore
-const { div, h1, p, li, a, nav, ul } = require("hyperaxe");
-const fs = require("fs/promises");
-const path = require("path");
+import { div, h1, p, li, a, nav, ul } from "hyperaxe";
+import fs from "fs/promises";
+import path from "path";
 
-async function fileExists(path) {
-    try {
-        await fs.access(path);
-        return true;
-    } catch {
-        return false;
-    }
+interface MenuSection {
+    type: "section",
+    label : string,
+    items : MenuItem []
 }
 
-/**
- * @param {MenuItem} menu
- * @return {MenuItem []}
- */
-function flattenMenu(menu) {
+interface MenuLink {
+    type: "link",
+    label : string,
+    href : string
+}
+
+type MenuItem = MenuSection | MenuLink | string;
+type Menu = MenuItem [];
+type PageId = string;
+
+function flattenMenu(menu : MenuItem) : MenuItem [] {
     if (typeof menu === "string") {
         return [menu];
     } else if (typeof menu === "object") {
@@ -66,13 +45,14 @@ function flattenMenu(menu) {
  *
  * This is because, otherwise this function would be too complex and do too much.
  *
- * @param {string} pageId The page we are looking for
- * @param {string []} acc The accumulator
- * @param {Menu} menuElements The menu to look into
- * @returns {string []|undefined} The partial breadcrumb to the page if found in
- *      the menu or undefined if the page is not found in the menu
+ * @param pageId The page we are looking for
+ * @param acc The accumulator
+ * @param menuElements The menu to look into
+ * @returns
+ *  The partial breadcrumb to the page if found in
+ *  the menu or undefined if the page is not found in the menu
  */
-function generatePartialBreadcrumb(pageId, acc, menuElements) {
+function generatePartialBreadcrumb(pageId : PageId, acc : string [], menuElements : Menu) : string [] | undefined {
     const [currentMenuItem, ...restOfMenu] = menuElements;
 
     // There is no more menu to process, meaning we didn't find the pageId
@@ -115,10 +95,10 @@ function generatePartialBreadcrumb(pageId, acc, menuElements) {
 
 /**
  *
- * @param {string} fileStem
- * @returns {string} The pageId representing the provided fileStem
+ * @param fileStem
+ * @returns The pageId representing the provided fileStem
  */
-function getPageId(fileStem) {
+function getPageId(fileStem : string) {
     //  Normal the path, so we can split using the path separator
     const normalizedInputPath = path.normalize(fileStem);
     // Extract all the segments of the path
@@ -132,11 +112,11 @@ function getPageId(fileStem) {
 
 /**
  * The generate the full breadcrumb to the provided path
- * @param {object} page Page to generate for
- * @param {Menu} menuConfig Menu configuration to look for the page into
- * @returns {string [] | undefined} Return the list of all the label representing the path to the provided path
+ * @param page Page to generate for
+ * @param menuConfig Menu configuration to look for the page into
+ * @returns Return the list of all the label representing the path to the provided path
  */
-function generateBreadcrumb(page, menuConfig) {
+function generateBreadcrumb(page : any, menuConfig : Menu) : string [] | undefined {
     // If the page doesn't have a menu, return nothing
     if (menuConfig == null) {
         return undefined;
@@ -155,13 +135,7 @@ function generateBreadcrumb(page, menuConfig) {
     }
 }
 
-/**
- *
- * @this object
- * @param {object []} pages
- * @returns
- */
-module.exports = function (pages) {
+export default function breadcrumbFilter (this : any, pages : any []) {
     const currentPage = pages.find(
         (page) => page.inputPath === this.ctx.page.inputPath
     );
@@ -184,3 +158,5 @@ module.exports = function (pages) {
             .outerHTML;
     }
 };
+
+module.exports = breadcrumbFilter;

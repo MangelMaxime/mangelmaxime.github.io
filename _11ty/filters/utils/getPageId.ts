@@ -1,13 +1,7 @@
-// @ts-check
-const path = require("path");
-const NacaraTypes = require("./../../types/nacara");
+import path from "path";
+// import NacaraTypes from "./../../types/nacara";
 
-/**
- *
- * @param {string} fileStem
- * @returns {NacaraTypes.PageId} The pageId representing the provided fileStem
- */
- module.exports = function getPageId(fileStem) {
+export default function getPageId(fileStem : string) {
     //  Normal the path, so we can split using the path separator
     const normalizedInputPath = path.normalize(fileStem);
     // Extract all the segments of the path
@@ -17,4 +11,4 @@ const NacaraTypes = require("./../../types/nacara");
     const pageIdSegments = inputPathSegments.slice(2);
 
     return pageIdSegments.join("/");
-}
+};

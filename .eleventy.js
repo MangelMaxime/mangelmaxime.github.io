@@ -59,17 +59,17 @@ module.exports = function (eleventyConfig) {
     }));
 
     // Filters
-    eleventyConfig.addNunjucksFilter("fav_icon_from_emoji", require("./_11ty/filters/favIconFromEmoji"));
-    eleventyConfig.addNunjucksAsyncFilter("last_modified_date", require("./_11ty/filters/lastModifiedDate"));
-    eleventyConfig.addNunjucksFilter("format_date", require("./_11ty/filters/formatDate"));
-    eleventyConfig.addNunjucksAsyncFilter("add_hash", require("./_11ty/filters/addHash"));
-    eleventyConfig.addNunjucksFilter("file_to_body_class", require("./_11ty/filters/fileToBodyClass"));
-    eleventyConfig.addNunjucksFilter("layout_to_body_class", require("./_11ty/filters/layoutToBodyClass"));
-    eleventyConfig.addNunjucksAsyncFilter("to_icon", require("./_11ty/filters/toIcon")());
+    eleventyConfig.addNunjucksFilter("fav_icon_from_emoji", require("./_11ty/_js/filters/favIconFromEmoji"));
+    eleventyConfig.addNunjucksAsyncFilter("last_modified_date", require("./_11ty/_js/filters/lastModifiedDate"));
+    eleventyConfig.addNunjucksFilter("format_date", require("./_11ty/_js/filters/formatDate"));
+    eleventyConfig.addNunjucksAsyncFilter("add_hash", require("./_11ty/_js/filters/addHash"));
+    eleventyConfig.addNunjucksFilter("file_to_body_class", require("./_11ty/_js/filters/fileToBodyClass"));
+    eleventyConfig.addNunjucksFilter("layout_to_body_class", require("./_11ty/_js/filters/layoutToBodyClass"));
+    eleventyConfig.addNunjucksAsyncFilter("to_icon", require("./_11ty/_js/filters/toIcon")());
 
     // Shortcodes
-    eleventyConfig.addNunjucksFilter("nacara_menu", require("./_11ty/filters/menu"));
-    eleventyConfig.addNunjucksFilter("nacara_breadcrumb", require("./_11ty/filters/breadcrumb"));
+    // eleventyConfig.addNunjucksFilter("nacara_menu", require("./_11ty/filters/menu"));
+    // eleventyConfig.addNunjucksFilter("nacara_breadcrumb", require("./_11ty/filters/breadcrumb"));
 
     // eleventyConfig.addPlugin(eleventyRemark, remarkOptions);
     // eleventyConfig.addPlugin(eleventyFsharpLiterate, remarkOptions);

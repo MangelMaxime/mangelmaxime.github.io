@@ -1,9 +1,9 @@
 // Idea is taken from: https://11ty.rocks/tips/layout-templating/
 // Compute the class representation of a page
 
-const path = require('path');
+import path from 'path';
 
-module.exports = function (filePath) {
+export default function fileToBodyClassFilter (filePath : string) {
     // console.log(filePath);
     // Compute path without extension
     const fileDir = path.dirname(filePath);
@@ -20,3 +20,5 @@ module.exports = function (filePath) {
 
     return `page--${bodyClass}`;
 };
+
+module.exports = fileToBodyClassFilter;

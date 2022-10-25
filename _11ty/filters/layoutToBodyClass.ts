@@ -1,9 +1,9 @@
 // Idea is taken from: https://11ty.rocks/tips/layout-templating/
 // Compute the class representation of a layout
 
-const path = require('path');
+import path from 'path';
 
-module.exports = function (layout) {
+export default function layoutToBodyClassFilter (layout : string) {
     // If layout is undefined, default to 'base'
 
     layout = layout || 'base';
@@ -27,3 +27,5 @@ module.exports = function (layout) {
 
     return `layout--${bodyClass}`;
 };
+
+module.exports = layoutToBodyClassFilter;

@@ -5,7 +5,7 @@ const { div, h1, p, li, a, nav, ul, aside } = require("hyperaxe");
 const fs = require("fs/promises");
 const path = require("path");
 const NacaraTypes = require("./../types/nacara");
-const EleventyTypes = require("./../types/eleventy");
+const EleventyTypes = require("./../types/eleventy.js");
 const getPageId = require("./utils/getPageId");
 
 async function fileExists(path) {

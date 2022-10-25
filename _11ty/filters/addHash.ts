@@ -1,16 +1,14 @@
 // @ts-check
 
-const fs = require("fs/promises");
-const crypto = require("crypto");
-const path = require("path");
-const EleventyTypes = require("./../types/eleventy.js");
+import fs from "fs/promises";
+import crypto from "crypto";
+import path from "path";
+import { asyncFilterCallback } from "@11ty/eleventy";
 
-/**
- *
- * @param {string} absolutePath
- * @param {EleventyTypes.asyncFilterCallback} callback
- */
-module.exports = async function (absolutePath, callback) {
+export default async function addHashFilter (
+    absolutePath: string,
+    callback: asyncFilterCallback
+) {
     try {
         const content = await fs.readFile(path.join(".", absolutePath), {
             encoding: "utf-8",
@@ -25,3 +23,5 @@ module.exports = async function (absolutePath, callback) {
         callback(new Error(`Failed to addHash to '${absolutePath}': ${error}`));
     }
 };
+
+module.exports = addHashFilter;

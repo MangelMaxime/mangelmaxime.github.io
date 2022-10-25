@@ -1,27 +1,30 @@
-const lucideIcons = require("lucide-static");
-const { createSVGWindow } = require("svgdom");
+// @ts-ignore
+import lucideIcons from "lucide-static";
+// @ts-ignore
+import { createSVGWindow } from "svgdom";
 const window = createSVGWindow();
 const document = window.document;
-const { SVG, registerWindow } = require("@svgdotjs/svg.js");
-const simpleIcons = require("simple-icons/icons");
-const fs = require("fs/promises");
-const path = require("path");
+import { SVG, registerWindow } from "@svgdotjs/svg.js";
+import simpleIcons from "simple-icons/icons";
+import fs from "fs/promises";
+import path from "path";
+import { asyncFilterCallback } from "@11ty/eleventy";
 
-/** @typedef {import('@svgdotjs/svg.js').SVGTypeMapping<T>} SVGTypeMapping */
+interface IconInformation {
+    iconName: string;
+    attributes: IconAttributeInformation[];
+}
 
-/**
- * @typedef IconInformation
- * @type {Object}
- * @property {string} iconName The name of the icon
- * @property {IconAttributeInformation []} attributes
- */
+interface IconAttributeInformation {
+    name: string;
+    value: string;
+}
 
-/**
- * @typedef IconAttributeInformation
- * @type {Object}
- * @property {string} name The name of the attribute
- * @property {string} value The value of the attribute
- */
+type GeneratorFunction = Promise<string | Error>;
+
+interface Options {
+    [key: string]: (iconString : string) => GeneratorFunction;
+}
 
 // register window and document
 registerWindow(window, document);
@@ -38,13 +41,13 @@ registerWindow(window, document);
  * @param {string} text The text to camelize
  * @returns The text camelized
  */
-function camelCase(text) {
+function camelCase(text: string): string {
     return text.replace(/-([a-z])/g, function (g) {
         return g[1].toUpperCase();
     });
 }
 
-async function fileExists(path) {
+async function fileExists(path: string) {
     try {
         await fs.access(path);
         return true;
@@ -56,14 +59,14 @@ async function fileExists(path) {
 /**
  * Extract the information from an iconString
  *
- * Format of the iconString : <icon-name>:<attribute-name>=<attribute-value>;<attribute-name>=<attribute-value>
+ * Format of the iconString : `<icon-name>:<attribute-name>=<attribute-value>;<attribute-name>=<attribute-value>`
  *
  * Example: mail:width=20;height=20
  *
- * @param {string} iconString
- * @return {IconInformation}
+ * @param iconString
+ * @returns The icon information
  */
-function extractIconInformation (iconString) {
+export function extractIconInformation(iconString: string): IconInformation {
     // If the icon string doesn't have a ';' it means that there is no options
     // we can return the icon string as is
     if (iconString.indexOf(";") === -1) {
@@ -73,13 +76,13 @@ function extractIconInformation (iconString) {
         };
     } else {
         const [iconName, ...options] = iconString.split(";");
-        const attributes = [];
+        const attributes: IconAttributeInformation[] = [];
 
         options.forEach((option) => {
             const [name, value] = option.split("=");
             attributes.push({
                 name: name,
-                value: value
+                value: value,
             });
         });
 
@@ -90,18 +93,16 @@ function extractIconInformation (iconString) {
     }
 }
 
-/**
- *
- * @param {SVGTypeMapping} svgElement
- * @param {IconAttributeInformation []} attributes
- */
-function setIconAttributes(svgElement, attributes) {
+export function setIconAttributes(
+    svgElement: any,
+    attributes: IconAttributeInformation[]
+): void {
     for (const attribute of attributes) {
         svgElement.attr(attribute.name, attribute.value);
     }
 }
 
-const lucideGenerator = function (iconString) {
+export async function lucideGenerator(iconString: string): GeneratorFunction {
     const { iconName, attributes } = extractIconInformation(iconString);
     const lucideIcon = lucideIcons[camelCase(iconName)];
 
@@ -113,9 +114,9 @@ const lucideGenerator = function (iconString) {
     } else {
         return new Error(`Icon ${iconName} not found in Lucide`);
     }
-};
+}
 
-const simpleIconsGenerator = function (iconString) {
+export async function simpleIconsGenerator(iconString: string): GeneratorFunction {
     const { iconName, attributes } = extractIconInformation(iconString);
     // Get all properties from the icon
     let simpleIcon = undefined;
@@ -138,13 +139,18 @@ const simpleIconsGenerator = function (iconString) {
     } else {
         return new Error(`Icon ${iconName} not found in simple-icons`);
     }
-};
+}
 
-const assetsGenerator = async function (iconString) {
+export async function assetsGenerator(iconString: string): GeneratorFunction {
     const { iconName, attributes } = extractIconInformation(iconString);
-    const iconPath = path.join(process.cwd(), "assets", "icons", `${iconName}.svg`);
+    const iconPath = path.join(
+        process.cwd(),
+        "assets",
+        "icons",
+        `${iconName}.svg`
+    );
 
-    if (fileExists(iconPath)) {
+    if (await fileExists(iconPath)) {
         const fileContent = await fs.readFile(iconPath);
         const iconSvg = SVG(fileContent.toString());
 
@@ -157,9 +163,9 @@ const assetsGenerator = async function (iconString) {
     } else {
         return new Error(`Icon ${iconName} not found in 'assets/icons' folder`);
     }
-};
+}
 
-const defaultIconOptions = {
+const defaultIconOptions : Options = {
     lucide: lucideGenerator,
     simpleIcons: simpleIconsGenerator,
     assets: assetsGenerator,
@@ -167,17 +173,17 @@ const defaultIconOptions = {
 
 /**
  *
- * @param {Object} options
+ * @param options
  * @returns An instance of a filter able to convert a string to an icon
  */
-module.exports = function toIconFilterBuilder(options) {
+export default function toIconFilterBuilder(options: Options) {
     const iconOptions = Object.assign({}, defaultIconOptions, options);
 
     /**
      * @param {string} icon
      * @param {any} callback
      */
-    return async function (icon, callback) {
+    return async function (icon: string, callback: asyncFilterCallback) {
         if (icon.indexOf(":") === -1) {
             callback(
                 new Error(
@@ -220,4 +226,6 @@ module.exports = function toIconFilterBuilder(options) {
             }
         }
     };
-};
+}
+
+module.exports = toIconFilterBuilder;
