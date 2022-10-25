@@ -42,8 +42,6 @@ pipeline "Site" {
             cmdArg "--watch"
         }
 
-        paralle
-
         envVars
             [
                 "ELEVENTY_ENV", "dev"
@@ -52,8 +50,13 @@ pipeline "Site" {
         // First compile the TypeScript, so when Eleventy starts, it can find the JS files
         run "npx tsc"
 
-        stage "TypeScript" { run "npx tsc --watch --preserveWatchOutput" }
-        stage "Eleventy" { run "npx @11ty/eleventy --serve" }
+        stage "Paralell" {
+            paralle
+
+            stage "TypeScript" { run "npx tsc --watch --preserveWatchOutput" }
+            stage "Eleventy" { run "npx @11ty/eleventy --serve" }
+        }
+
     }
 
     stage "Build" {
