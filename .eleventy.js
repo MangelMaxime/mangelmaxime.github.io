@@ -35,6 +35,9 @@ const remarkOptions = {
 };
 
 module.exports = function (eleventyConfig) {
+    // Disable use of .gitingore because some of the files are not
+    // tracked in git but needs to be used by Eleventy.
+    eleventyConfig.setUseGitIgnore(false);
 
     // set copy asset folder to dist
     eleventyConfig.addPassthroughCopy("assets");

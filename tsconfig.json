@@ -7,7 +7,7 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "rootDir": "./_11ty/",
+        "rootDir": "./src",
         "outDir": "./_11ty/_js/",
         "jsx": "react",
         "jsxFactory": "h",

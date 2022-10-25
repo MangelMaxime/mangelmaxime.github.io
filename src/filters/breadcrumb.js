@@ -1,40 +1,11 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 // @ts-ignore
-import { div, h1, p, li, a, nav, ul } from "hyperaxe";
-import fs from "fs/promises";
-import path from "path";
-
-interface MenuSection {
-    type: "section",
-    label : string,
-    items : MenuItem []
-}
-
-interface MenuLink {
-    type: "link",
-    label : string,
-    href : string
-}
-
-type MenuItem = MenuSection | MenuLink | string;
-type Menu = MenuItem [];
-type PageId = string;
-
-function flattenMenu(menu : MenuItem) : MenuItem [] {
-    if (typeof menu === "string") {
-        return [menu];
-    } else if (typeof menu === "object") {
-        if (menu.type === "link") {
-            return [menu];
-        } else if (menu.type === "section") {
-            return menu.items.flatMap(flattenMenu);
-        } else {
-            throw "Invalid menu item element"
-        }
-    } else {
-        throw "Invalid menu item element"
-    }
-}
-
+const hyperaxe_1 = require("hyperaxe");
+const path_1 = __importDefault(require("path"));
 /**
  *
  * Generate the partial breadcrumb to a give page.
@@ -52,111 +23,96 @@ function flattenMenu(menu : MenuItem) : MenuItem [] {
  *  The partial breadcrumb to the page if found in
  *  the menu or undefined if the page is not found in the menu
  */
-function generatePartialBreadcrumb(pageId : PageId, acc : string [], menuElements : Menu) : string [] | undefined {
+function generatePartialBreadcrumb(pageId, acc, menuElements) {
     const [currentMenuItem, ...restOfMenu] = menuElements;
-
     // There is no more menu to process, meaning we didn't find the pageId
     // Return nothing
     if (currentMenuItem === undefined) {
         return undefined;
-    } else {
+    }
+    else {
         if (typeof currentMenuItem === "string") {
             // This is the page we are looking for
             // Store the pageId in the accumulator and return the result
             if (currentMenuItem === pageId) {
                 return [...acc];
                 // Keep looking
-            } else {
+            }
+            else {
                 return generatePartialBreadcrumb(pageId, acc, restOfMenu);
             }
-        } else if (typeof currentMenuItem === "object") {
+        }
+        else if (typeof currentMenuItem === "object") {
             // A link cannot beling to the breadcrumb, so we skip it
             if (currentMenuItem.type === "link") {
                 return generatePartialBreadcrumb(pageId, acc, restOfMenu);
-            } else if (currentMenuItem.type === "section") {
-                const sectionResult = generatePartialBreadcrumb(
-                    pageId,
-                    [...acc, currentMenuItem.label],
-                    currentMenuItem.items
-                );
-
+            }
+            else if (currentMenuItem.type === "section") {
+                const sectionResult = generatePartialBreadcrumb(pageId, [...acc, currentMenuItem.label], currentMenuItem.items);
                 // If the current section doesn't contain the pageId, we keep looking
                 if (sectionResult === undefined) {
                     return generatePartialBreadcrumb(pageId, acc, restOfMenu);
                     // We got a result, so we store the section title in the accumulator
                     // and return the result
-                } else {
+                }
+                else {
                     return sectionResult;
                 }
             }
         }
     }
 }
-
 /**
  *
  * @param fileStem
  * @returns The pageId representing the provided fileStem
  */
-function getPageId(fileStem : string) {
+function getPageId(fileStem) {
     //  Normal the path, so we can split using the path separator
-    const normalizedInputPath = path.normalize(fileStem);
+    const normalizedInputPath = path_1.default.normalize(fileStem);
     // Extract all the segments of the path
-    const inputPathSegments = normalizedInputPath.split(path.sep);
+    const inputPathSegments = normalizedInputPath.split(path_1.default.sep);
     // console.log("inputPathSegments:", inputPathSegments);
     // Build the section direction, which consist of the root + the first segment of the path
     const pageIdSegments = inputPathSegments.slice(2);
-
     return pageIdSegments.join("/");
 }
-
 /**
  * The generate the full breadcrumb to the provided path
  * @param page Page to generate for
  * @param menuConfig Menu configuration to look for the page into
  * @returns Return the list of all the label representing the path to the provided path
  */
-function generateBreadcrumb(page : any, menuConfig : Menu) : string [] | undefined {
+function generateBreadcrumb(page, menuConfig) {
     // If the page doesn't have a menu, return nothing
     if (menuConfig == null) {
         return undefined;
     }
-
     const pageId = getPageId(page.filePathStem);
-
     const partialBreadcrumb = generatePartialBreadcrumb(pageId, [], menuConfig);
-
     // If the page is not found in the menu, we return nothing
     if (partialBreadcrumb === undefined) {
         return undefined;
         // Otherwise, we compute the current page title and return the full breadcrumb
-    } else {
+    }
+    else {
         return [...partialBreadcrumb, page.data.title];
     }
 }
-
-export default function breadcrumbFilter (this : any, pages : any []) {
-    const currentPage = pages.find(
-        (page) => page.inputPath === this.ctx.page.inputPath
-    );
-
-    const breadcrumbItems = generateBreadcrumb(
-        currentPage,
-        currentPage.data.menu
-    );
-
+function breadcrumbFilter(pages) {
+    const currentPage = pages.find((page) => page.inputPath === this.ctx.page.inputPath);
+    const breadcrumbItems = generateBreadcrumb(currentPage, currentPage.data.menu);
     if (breadcrumbItems === undefined) {
         return undefined;
-    } else {
-        const breadcrumbItemsHtml = breadcrumbItems.map(
-            (breadcrumbItem) => {
-                return li({ class: "is-active" }, a(breadcrumbItem));
-            }
-        );
-
-        return nav({ class: "breadcrumb" }, ul(breadcrumbItemsHtml))
+    }
+    else {
+        const breadcrumbItemsHtml = breadcrumbItems.map((breadcrumbItem) => {
+            return (0, hyperaxe_1.li)({ class: "is-active" }, (0, hyperaxe_1.a)(breadcrumbItem));
+        });
+        return (0, hyperaxe_1.nav)({ class: "breadcrumb" }, (0, hyperaxe_1.ul)(breadcrumbItemsHtml))
             .outerHTML;
     }
-};
-
+}
+exports.default = breadcrumbFilter;
+;
 module.exports = breadcrumbFilter;

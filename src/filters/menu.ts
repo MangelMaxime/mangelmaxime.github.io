@@ -1,27 +1,17 @@
 // @ts-check
 
 // @ts-ignore
-const { div, h1, p, li, a, nav, ul, aside } = require("hyperaxe");
-const fs = require("fs/promises");
-const path = require("path");
-const NacaraTypes = require("./../types/nacara");
-const EleventyTypes = require("./../types/eleventy.js");
-const getPageId = require("./utils/getPageId");
-
-async function fileExists(path) {
-    try {
-        await fs.access(path);
-        return true;
-    } catch {
-        return false;
-    }
-}
+import { div, h1, p, li, a, nav, ul, aside } from "hyperaxe";
+import fs from "fs/promises";
+import path from "path";
+import { asyncFilterCallback } from "@11ty/eleventy";
+import getPageId from "./utils/getPageId";
 
 /**
- * @param {NacaraTypes.MenuItem} menu
+ * @param
  * @return {NacaraTypes.MenuItem []}
  */
-function flattenMenu(menu) {
+function flattenMenu(menu : MenuItem) : MenuItem [] {
     if (typeof menu === "string") {
         return [menu];
     } else if (typeof menu === "object") {
@@ -42,7 +32,7 @@ function flattenMenu(menu) {
  * @param {EleventyTypes.Page []} pages
  * @param {NacaraTypes.PageId} currentPageId
  */
-function renderMenuItemPage(pageIdOfPageToRender, pages, currentPageId) {
+function renderMenuItemPage(pageIdOfPageToRender : MenuItem, pages : any [], currentPageId : PageId) {
     const pageOfMenuItem = pages.find(
         (page) => getPageId(page.filePathStem) === pageIdOfPageToRender
     );
@@ -71,11 +61,11 @@ function renderMenuItemPage(pageIdOfPageToRender, pages, currentPageId) {
 
 /**
  *
- * @param {NacaraTypes.MenuItem} menuItem
- * @param {EleventyTypes.Page []} pages
- * @param {NacaraTypes.PageId} currentPageId
+ * @param menuItem
+ * @param pages
+ * @param currentPageId
  */
-function renderSubMenu(menuItem, pages, currentPageId) {
+function renderSubMenu(menuItem : MenuItem, pages : any, currentPageId : PageId) {
     if (typeof menuItem === "string") {
         return renderMenuItemPage(menuItem, pages, currentPageId);
     } else if (typeof menuItem === "object") {
@@ -90,11 +80,11 @@ function renderSubMenu(menuItem, pages, currentPageId) {
 
 /**
  *
- * @param {NacaraTypes.Menu} menu
- * @param {EleventyTypes.Page []} pages
- * @param {NacaraTypes.PageId} currentPageId
+ * @param menu
+ * @param pages
+ * @param currentPageId
  */
-function renderMenu(menu, pages, currentPageId) {
+function renderMenu(menu : Menu, pages : any, currentPageId : PageId) {
     const menuElements = menu.map((menuItem) => {
         if (typeof menuItem === "string") {
             return ul(
@@ -137,11 +127,10 @@ function renderMenu(menu, pages, currentPageId) {
 
 /**
  *
- * @this object
- * @param {object []} pages
+ * @param pages
  * @returns
  */
-module.exports = function (pages) {
+module.exports = function (this : any, pages : any []) {
     /**
      * @type {EleventyTypes.Page & NacaraTypes.PageData}
      */
