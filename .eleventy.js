@@ -5,6 +5,8 @@ const rehypeRaw = require("rehype-raw");
 const rehypeStringify = require("rehype-stringify");
 const remarkToRehype = require("remark-rehype");
 const eleventySass = require("eleventy-sass");
+const rehypeSlug = require("rehype-slug");
+const rehypeAutolinkHeadings = require("rehype-autolink-headings");
 
 const remarkOptions = {
     enableRehype: false,
@@ -22,6 +24,26 @@ const remarkOptions = {
             options: {
                 allowDangerousHtml: true,
             },
+        },
+        rehypeSlug,
+        {
+            plugin: rehypeAutolinkHeadings,
+            options: {
+                behavior: "append",
+                content: [
+                    {
+                        type: "element",
+                        tagName: "span",
+                        properties: { className: ["anchor"] },
+                        children: [
+                            {
+                                type: "text",
+                                value: "#",
+                            }
+                        ]
+                    }
+                ],
+            }
         },
         rehypeRaw,
         {
@@ -57,22 +79,51 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPlugin(eleventySass);
 
     eleventyConfig.addPlugin(eleventyRemark, remarkOptions);
-    eleventyConfig.addPlugin(eleventyFsharpLiterate({
-        eleventyRemarkOptions: remarkOptions
-    }));
+    eleventyConfig.addPlugin(
+        eleventyFsharpLiterate({
+            eleventyRemarkOptions: remarkOptions,
+        })
+    );
 
     // Filters
-    eleventyConfig.addNunjucksFilter("fav_icon_from_emoji", require("./_11ty/_js/filters/favIconFromEmoji"));
-    eleventyConfig.addNunjucksAsyncFilter("last_modified_date", require("./_11ty/_js/filters/lastModifiedDate"));
-    eleventyConfig.addNunjucksFilter("format_date", require("./_11ty/_js/filters/formatDate"));
-    eleventyConfig.addNunjucksAsyncFilter("add_hash", require("./_11ty/_js/filters/addHash"));
-    eleventyConfig.addNunjucksFilter("file_to_body_class", require("./_11ty/_js/filters/fileToBodyClass"));
-    eleventyConfig.addNunjucksFilter("layout_to_body_class", require("./_11ty/_js/filters/layoutToBodyClass"));
-    eleventyConfig.addNunjucksAsyncFilter("to_icon", require("./_11ty/_js/filters/toIcon")());
+    eleventyConfig.addNunjucksFilter(
+        "fav_icon_from_emoji",
+        require("./_11ty/_js/filters/favIconFromEmoji")
+    );
+    eleventyConfig.addNunjucksAsyncFilter(
+        "last_modified_date",
+        require("./_11ty/_js/filters/lastModifiedDate")
+    );
+    eleventyConfig.addNunjucksFilter(
+        "format_date",
+        require("./_11ty/_js/filters/formatDate")
+    );
+    eleventyConfig.addNunjucksAsyncFilter(
+        "add_hash",
+        require("./_11ty/_js/filters/addHash")
+    );
+    eleventyConfig.addNunjucksFilter(
+        "file_to_body_class",
+        require("./_11ty/_js/filters/fileToBodyClass")
+    );
+    eleventyConfig.addNunjucksFilter(
+        "layout_to_body_class",
+        require("./_11ty/_js/filters/layoutToBodyClass")
+    );
+    eleventyConfig.addNunjucksAsyncFilter(
+        "to_icon",
+        require("./_11ty/_js/filters/toIcon")()
+    );
 
     // Shortcodes
-    // eleventyConfig.addNunjucksFilter("nacara_menu", require("./_11ty/filters/menu"));
-    // eleventyConfig.addNunjucksFilter("nacara_breadcrumb", require("./_11ty/filters/breadcrumb"));
+    eleventyConfig.addNunjucksFilter(
+        "nacara_menu",
+        require("./_11ty/_js/filters/menu")
+    );
+    eleventyConfig.addNunjucksFilter(
+        "nacara_breadcrumb",
+        require("./_11ty/_js/filters/breadcrumb")
+    );
 
     // eleventyConfig.addPlugin(eleventyRemark, remarkOptions);
     // eleventyConfig.addPlugin(eleventyFsharpLiterate, remarkOptions);

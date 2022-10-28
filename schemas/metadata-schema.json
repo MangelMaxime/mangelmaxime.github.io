@@ -21,6 +21,9 @@
         "description": {
             "type": "string"
         },
+        "editUrl": {
+            "type": "string"
+        },
         "author": {
             "type": "object",
             "required": [

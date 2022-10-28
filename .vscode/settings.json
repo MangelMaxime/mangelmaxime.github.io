@@ -21,8 +21,5 @@
         "editor.wordWrapColumn": 100,
         "editor.wordWrap": "bounded"
     },
-    "html.suggest.html5": true,
-    "files.associations": {
-        "*.njk": "njk"
-    }
+    "html.suggest.html5": true
 }
