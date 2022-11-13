@@ -24,6 +24,9 @@
         "editUrl": {
             "type": "string"
         },
+        "baseUrl": {
+            "type": "string"
+        },
         "author": {
             "type": "object",
             "required": [

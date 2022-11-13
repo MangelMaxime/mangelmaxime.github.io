@@ -124,6 +124,10 @@ module.exports = function (eleventyConfig) {
         "nacara_breadcrumb",
         require("./_11ty/_js/filters/breadcrumb")
     );
+    eleventyConfig.addNunjucksFilter(
+        "nacara_navigation",
+        require("./_11ty/_js/filters/navigation")
+    )
 
     // eleventyConfig.addPlugin(eleventyRemark, remarkOptions);
     // eleventyConfig.addPlugin(eleventyFsharpLiterate, remarkOptions);

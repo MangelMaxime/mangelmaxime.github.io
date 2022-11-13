@@ -1,32 +1,26 @@
-[
-    {
-        "type": "section",
-        "label": "Overview",
-        "items": [
-            "introduction",
-            "configuration"
-        ]
-    },
-    {
-        "type": "section",
-        "label": "Guides",
-        "items": [
-            {
-                "type": "section",
-                "label": "Guides22",
-                "items": [
-                    "guides/create-a-page",
-                    "guides/customize-the-style"
-                ]
-            },
-            "guides/customize-the-style"
-        ]
-    },
-    {
-        "type": "link",
-        "label": "Fable",
-        "href": "http://fable.io"
-    },
-    "guides/create-a-page",
-    "guides/customize-the-style"
-]
+{
+    "$schema": "./../schemas/menu-schema.json",
+    "items": [
+        {
+            "type": "section",
+            "label": "Section 1",
+            "items": [
+                "introduction",
+                "configuration"
+            ]
+        },
+        "guides/create-a-page",
+        {
+            "type": "section",
+            "label": "Section 2",
+            "items": [
+                "guides/customize-the-style"
+            ]
+        },
+        {
+            "type": "link",
+            "label": "Fable",
+            "href": "https://fable.io"
+        }
+    ]
+}

@@ -29,7 +29,15 @@ module.exports = {
         // If the menu.json file exists, read it and expose
         if (await fileExists(menuFilepath)) {
             const menu = await fs.readFile(menuFilepath);
-            return JSON.parse(menu);
+            const parsedMenu = JSON.parse(menu);
+
+            if (typeof parsedMenu === 'object') {
+                return parsedMenu.items;
+            } else if (typeof parsedMenu === 'array') {
+                return parsedMenu;
+            } else {
+                throw new Error('Invalid menu.json file');
+            }
         }
 
         // Otherwise, return null
